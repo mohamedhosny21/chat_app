@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>829298540112-bs1386lrcpp2djcpl4rc1dsf2rpuomds.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.829298540112-bs1386lrcpp2djcpl4rc1dsf2rpuomds</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>829298540112-pq8u79es9aer8lgglgfjbopf3bsfjuo2.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyC7M_2YqmqeblY_Z9lghlptPDRDFC6_1Tc</string>
+	<key>GCM_SENDER_ID</key>
+	<string>829298540112</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.chatify.RunnerTests</string>
+	<key>PROJECT_ID</key>
+	<string>flutter-maps-d6a2e</string>
+	<key>STORAGE_BUCKET</key>
+	<string>flutter-maps-d6a2e.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:829298540112:ios:10bd86779237313bffdb55</string>
+</dict>
+</plist>
