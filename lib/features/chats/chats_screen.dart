@@ -29,9 +29,16 @@ class ChatsScreen extends StatelessWidget {
                   style: AppStyles.font18Black600Weight,
                 ),
                 const Spacer(),
-                const CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      'https://th.bing.com/th/id/OIP.NqY3rNMnx2NXYo3KJfg43gAAAA?w=183&h=183&c=7&r=0&o=5&dpr=1.4&pid=1.7'),
+                GestureDetector(
+                  onTap: () {
+                    context.read<AuthenticationCubit>().signOut();
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, Routes.loginScreen, (route) => false);
+                  },
+                  child: const CircleAvatar(
+                    backgroundImage: NetworkImage(
+                        'https://th.bing.com/th/id/OIP.NqY3rNMnx2NXYo3KJfg43gAAAA?w=183&h=183&c=7&r=0&o=5&dpr=1.4&pid=1.7'),
+                  ),
                 )
               ],
             ),
@@ -48,9 +55,7 @@ class ChatsScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
           backgroundColor: AppColors.mainPink,
           onPressed: () {
-            context.read<AuthenticationCubit>().signOut();
-            Navigator.pushNamedAndRemoveUntil(
-                context, Routes.loginScreen, (route) => false);
+            Navigator.pushNamed(context, Routes.contactsScreen);
           },
           child: Icon(
             Icons.add_comment_outlined,

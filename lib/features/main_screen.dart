@@ -1,10 +1,11 @@
+import 'package:chatify/features/login/logic/authentication_cubit/authentication_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'calls/calls_screen.dart';
 import 'chats/chats_screen.dart';
-import 'contacts/all_contacts_screen.dart';
-import 'login/logic/authentication_cubit/authentication_cubit.dart';
+import 'contacts/ui/all_contacts_screen.dart';
 import 'profile/profile_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class NavBarPages extends StatefulWidget {
   const NavBarPages({super.key});
@@ -15,12 +16,12 @@ class NavBarPages extends StatefulWidget {
 
 class _NavBarPagesState extends State<NavBarPages> {
   final List<Widget> pages = [
-    BlocProvider<AuthenticationCubit>(
-      create: (context) => AuthenticationCubit(),
+    BlocProvider<AuthenticationCubit>.value(
+      value: AuthenticationCubit(),
       child: const ChatsScreen(),
     ),
     const CallsScreen(),
-    const AllContactsScreen(),
+    const ContactsScreen(),
     const ProfileScreen()
   ];
   int index = 0;
@@ -51,8 +52,6 @@ class _NavBarPagesState extends State<NavBarPages> {
               icon: Icon(Icons.call),
               label: 'Calls',
             ),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.people_outline_sharp), label: 'Contacts'),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile')
           ]),
     );

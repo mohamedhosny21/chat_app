@@ -1,3 +1,5 @@
+import 'package:chatify/features/chats/logic/cubit/chats_cubit.dart';
+
 import '../../../../constants/colors.dart';
 import '../../../../constants/dimensions.dart';
 import '../../../../constants/styles.dart';
@@ -115,8 +117,12 @@ class OtpScreen extends StatelessWidget {
           showCircularProgressIndicator(context);
         } else if (state is LoginSuccessState) {
           Navigator.pop(context);
-          Navigator.of(context)
-              .pushNamedAndRemoveUntil(Routes.homeScreen, (route) => false);
+          context
+              .read<ChatsCubit>()
+              .createNewUser(phoneNumber: phoneNumber.completeNumber);
+          Navigator.of(context).pushNamedAndRemoveUntil(
+              Routes.homeScreen, (route) => false,
+              arguments: phoneNumber);
         } else if (state is LoginFailedState) {
           Navigator.pop(context);
           showErrorSnackBar(context, state.errorMsg);
