@@ -1,3 +1,5 @@
+import 'package:chatify/widgets/shared_preferences.dart';
+
 import '../../../../constants/colors.dart';
 import '../../../../constants/dimensions.dart';
 import '../../../../constants/styles.dart';
@@ -114,6 +116,8 @@ class OtpScreen extends StatelessWidget {
         if (state is LoginLoadingState) {
           showCircularProgressIndicator(context);
         } else if (state is LoginSuccessState) {
+          AppSharedPreferences.savePhoneNumberInSharedPrefs(
+              phoneNumber.completeNumber);
           Navigator.pop(context);
           Navigator.of(context)
               .pushNamedAndRemoveUntil(Routes.homeScreen, (route) => false);

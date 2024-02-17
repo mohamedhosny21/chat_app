@@ -8,7 +8,7 @@ class AppStyles {
     fontWeight: FontWeight.w600,
     fontSize: 18.sp,
   );
-  static TextStyle font10Black400Weight = TextStyle(
+  static TextStyle font12Black400Weight = TextStyle(
     color: AppColors.mainBlack,
     fontWeight: FontWeight.w400,
     fontSize: 12.sp,

@@ -67,6 +67,9 @@ class LoginScreen extends StatelessWidget {
 
   Widget buildPhoneFormField() {
     return IntlPhoneField(
+      onTapOutside: (event) {
+        FocusManager.instance.primaryFocus!.unfocus();
+      },
       style: AppStyles.font14Black400Weight
           .copyWith(letterSpacing: 3, fontWeight: FontWeight.bold),
       decoration: const InputDecoration(

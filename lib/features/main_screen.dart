@@ -1,6 +1,7 @@
+import 'package:chatify/features/contacts/ui/contacts_screen.dart';
+
 import 'calls/calls_screen.dart';
 import 'chats/chats_screen.dart';
-import 'contacts/all_contacts_screen.dart';
 import 'login/logic/authentication_cubit/authentication_cubit.dart';
 import 'profile/profile_screen.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,6 @@ class _NavBarPagesState extends State<NavBarPages> {
       child: const ChatsScreen(),
     ),
     const CallsScreen(),
-    const AllContactsScreen(),
     const ProfileScreen()
   ];
   int index = 0;
@@ -51,8 +51,6 @@ class _NavBarPagesState extends State<NavBarPages> {
               icon: Icon(Icons.call),
               label: 'Calls',
             ),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.people_outline_sharp), label: 'Contacts'),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile')
           ]),
     );

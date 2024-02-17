@@ -10,7 +10,7 @@ class UserStories extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 100.h,
+      height: 110.h,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) {
@@ -105,7 +105,7 @@ class StoryContainer extends StatelessWidget {
           constraints: BoxConstraints(maxWidth: 64.w),
           child: Text(
             text,
-            style: AppStyles.font10Black400Weight,
+            style: AppStyles.font12Black400Weight,
             textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
             maxLines: 2,

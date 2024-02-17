@@ -23,3 +23,5 @@ class LoginFailedState extends AuthenticationState {
 
   LoginFailedState({required this.errorMsg});
 }
+
+class USerCreationState extends AuthenticationState {}

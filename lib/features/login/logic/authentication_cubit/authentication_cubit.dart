@@ -1,13 +1,16 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../constants/strings.dart';
 
 part 'authentication_state.dart';
 
 class AuthenticationCubit extends Cubit<AuthenticationState> {
   final GlobalKey<FormState> phoneAuthFormKey = GlobalKey<FormState>();
   final GlobalKey<FormState> pinFormKey = GlobalKey<FormState>();
-
+  final database = FirebaseFirestore.instance;
   AuthenticationCubit() : super(AuthenticationInitial());
 
   Future<void> loginWithPhoneNumber(String phoneNumber) async {
@@ -70,5 +73,29 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
         verificationId: verificationId, smsCode: smsCode);
     debugPrint('verificationId : $verificationId');
     await signIn(phoneAuthCredential);
+  } // Create new user
+
+  void createNewUser({required String phoneNumber}) async {
+    final userExists = await checkUserExists(phoneNumber);
+
+    if (!userExists) {
+      final user = <String, dynamic>{
+        "phone_number": phoneNumber,
+        "photo": AppConstants.defaultUserPhoto
+      };
+      database.collection("Users").add(user).then(
+          (doc) => debugPrint('DocumentSnapshot added with ID: ${doc.id}'));
+      emit(USerCreationState());
+    }
+  }
+
+  // Check if user exists by phone number
+  Future<bool> checkUserExists(String phoneNumber) async {
+    final existingUserQuery = await database
+        .collection("Users")
+        .where("phone_number", isEqualTo: phoneNumber)
+        .get();
+
+    return existingUserQuery.docs.isNotEmpty;
   }
 }
