@@ -67,6 +67,7 @@ class LoginScreen extends StatelessWidget {
 
   Widget buildPhoneFormField() {
     return IntlPhoneField(
+      //edited by me in original intlphonefield library
       onTapOutside: (event) {
         FocusManager.instance.primaryFocus!.unfocus();
       },
