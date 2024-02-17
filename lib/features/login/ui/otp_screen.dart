@@ -116,9 +116,13 @@ class OtpScreen extends StatelessWidget {
         if (state is LoginLoadingState) {
           showCircularProgressIndicator(context);
         } else if (state is LoginSuccessState) {
+          Navigator.pop(context);
+
           AppSharedPreferences.savePhoneNumberInSharedPrefs(
               phoneNumber.completeNumber);
-          Navigator.pop(context);
+          context
+              .read<AuthenticationCubit>()
+              .createNewUser(phoneNumber: phoneNumber.completeNumber);
           Navigator.of(context)
               .pushNamedAndRemoveUntil(Routes.homeScreen, (route) => false);
         } else if (state is LoginFailedState) {
