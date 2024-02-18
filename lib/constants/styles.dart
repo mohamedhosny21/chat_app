@@ -23,10 +23,21 @@ class AppStyles {
       fontSize: 14.sp, color: AppColors.mainGrey, fontWeight: FontWeight.w600);
 
   static TextStyle font10Grey400Weight = TextStyle(
-      fontSize: 10.sp, color: AppColors.grey, fontWeight: FontWeight.w400);
+      fontSize: 10.sp,
+      color: AppColors.mediumGrey,
+      fontWeight: FontWeight.w400);
   static TextStyle font11Grey400Weight = TextStyle(
-      fontSize: 11.sp, color: AppColors.grey, fontWeight: FontWeight.w400);
+      fontSize: 11.sp,
+      color: AppColors.mediumGrey,
+      fontWeight: FontWeight.w400);
+  static TextStyle font12DarkGrey500Weight = TextStyle(
+      fontSize: 12.sp, color: AppColors.darkGrey, fontWeight: FontWeight.w500);
 
   static TextStyle font20GreyBold = TextStyle(
-      fontSize: 20.sp, color: AppColors.grey, fontWeight: FontWeight.bold);
+      fontSize: 20.sp,
+      color: AppColors.mediumGrey,
+      fontWeight: FontWeight.bold);
+
+  static TextStyle font15White500Weight = TextStyle(
+      fontSize: 15.sp, color: Colors.white, fontWeight: FontWeight.w500);
 }

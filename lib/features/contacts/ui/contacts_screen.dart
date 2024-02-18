@@ -5,6 +5,7 @@ import 'package:chatify/widgets/circular_progress_indicator.dart';
 import 'package:chatify/widgets/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../logic/contacts_cubit/cubit/contacts_cubit.dart';
 import 'widgets/contacts_item_widget.dart';
@@ -28,7 +29,16 @@ class _ContactsScreenState extends State<ContactsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: AppColors.mainPink,
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: const Icon(
+              Icons.arrow_back_ios_new_sharp,
+            ),
+            iconSize: 24.w,
+          ),
+          backgroundColor: AppColors.lightPink,
           title: Text(
             'My Contacts',
             style: AppStyles.font18Black600Weight,
@@ -43,10 +53,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
     return BlocConsumer<ContactsCubit, ContactsState>(
       builder: (context, state) {
         if (state is ContactsLoadedState) {
-          Navigator.pop(context);
-
           return Padding(
-            padding: AppDimensions.paddingSymmetricV12H12,
+            padding: AppDimensions.paddingTop12,
             child: ListView.separated(
               separatorBuilder: (context, index) =>
                   AppDimensions.verticalSpacing16,
@@ -72,6 +80,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
       listener: (context, state) {
         if (state is ContactsLoadingState) {
           showCircularProgressIndicator(context);
+        } else if (state is ContactsLoadedState) {
+          Navigator.pop(context);
         } else if (state is ContactsErrorState) {
           Navigator.pop(context);
           showErrorSnackBar(context, state.errorMsg);

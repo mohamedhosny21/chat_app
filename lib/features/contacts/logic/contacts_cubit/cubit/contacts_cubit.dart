@@ -18,7 +18,7 @@ class ContactsCubit extends Cubit<ContactsState> {
       emit(ContactsLoadingState());
 
       if (requestPermission) {
-        FlutterContacts.addListener(() => print('Contact DB changed'));
+        FlutterContacts.addListener(() => debugPrint('Contact DB changed'));
 
         //get all contacts
         List<Contact> deviceContacts = await FlutterContacts.getContacts(
@@ -108,7 +108,8 @@ class ContactsCubit extends Cubit<ContactsState> {
   }
 }
  /****************Example for chunk Calcuation***************/
-         /* Suppose devicePhoneNumbers.length is 120, and chunkSize is 30.
+         /* 
+         *Suppose devicePhoneNumbers.length is 120, and chunkSize is 30.
          * then : ((120 + 30 - 1) / 30).ceil() = (149 / 30).ceil() = 5
          * So, we need 5 chunks to cover all elements in devicePhoneNumbers.
          * 
@@ -116,16 +117,16 @@ class ContactsCubit extends Cubit<ContactsState> {
          * For index = 0:
 Start index: 0 * 30 = 0
 End index: 0+30 = 30 (less than devicePhoneNumbers.length, so it takes 30 elements)
-For index = 1:
+*For index = 1:
 Start index: 1 * 30 = 30
 End index: 30+30 = 60 (less than devicePhoneNumbers.length, so it takes 30 elements)
-For index = 2:
+*For index = 2:
 Start index: 2 * 30 = 60
 End index: 60+30 = 90 (less than devicePhoneNumbers.length, so it takes 30 elements)
-For index = 3:
+*For index = 3:
 Start index: 3 * 30 = 90
 End index: 90+30 = 120 (equals devicePhoneNumbers.length, so it takes the remaining 30 elements)
-For index = 4:
+*For index = 4:
 Start index: 4 * 30 = 120
 End index: 120+30 = 150 (greater than devicePhoneNumbers.length, so it takes the remaining 0 elements)
 So, we end up with 5 chunks, each containing the specified number of elements from devicePhoneNumbers, and the last chunk may contain fewer elements if needed.*/

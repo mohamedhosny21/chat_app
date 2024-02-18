@@ -1,5 +1,3 @@
-import 'package:chatify/features/contacts/ui/contacts_screen.dart';
-
 import 'calls/calls_screen.dart';
 import 'chats/chats_screen.dart';
 import 'login/logic/authentication_cubit/authentication_cubit.dart';

@@ -7,7 +7,10 @@ class AppDimensions {
       EdgeInsetsDirectional.symmetric(vertical: 14.h, horizontal: 10.w);
   static EdgeInsetsGeometry paddingSymmetricV12H12 =
       EdgeInsetsDirectional.symmetric(horizontal: 12.w, vertical: 12.h);
-
+  static EdgeInsetsGeometry paddingTop12 =
+      EdgeInsetsDirectional.only(top: 12.h);
+  static EdgeInsetsGeometry paddingTop50 =
+      EdgeInsetsDirectional.only(top: 50.h);
   static EdgeInsetsGeometry paddingSymmetricV50H50 =
       EdgeInsetsDirectional.symmetric(horizontal: 50.w, vertical: 50.h);
   /* *************** Vertical Sized Box  ***************** */

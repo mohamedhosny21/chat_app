@@ -5,7 +5,7 @@ import '../../constants/styles.dart';
 import '../login/logic/authentication_cubit/authentication_cubit.dart';
 import 'ui/chats_widgets/chats_widget.dart';
 import 'ui/chats_widgets/story_container_widget.dart';
-import 'ui/chats_widgets/textformfield_widget.dart';
+import '../../widgets/textformfield_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -53,13 +53,13 @@ class ChatsScreen extends StatelessWidget {
         ),
       )),
       floatingActionButton: FloatingActionButton(
-          backgroundColor: AppColors.mainPink,
+          backgroundColor: AppColors.lightPink,
           onPressed: () {
             Navigator.pushNamed(context, Routes.contactsScreen);
           },
           child: Icon(
             Icons.add_comment_outlined,
-            size: 24.sp,
+            size: 24.w,
           )),
     );
   }

@@ -38,7 +38,7 @@ class UserStoryItem extends StatelessWidget {
         color: Colors.white,
         child: Icon(
           Icons.person,
-          size: 24.sp,
+          size: 24.w,
           color: AppColors.mainGrey,
         ));
   }
@@ -55,7 +55,7 @@ class AddStoryContainer extends StatelessWidget {
       text: 'Add Story',
       child: Icon(
         Icons.add,
-        size: 24.sp,
+        size: 24.w,
         color: AppColors.mainGrey,
       ),
     );

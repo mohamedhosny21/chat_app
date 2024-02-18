@@ -48,7 +48,7 @@ class LoginScreen extends StatelessWidget {
                             .loginWithPhoneNumber(phoneNumber.completeNumber);
                       }
                     },
-                    color: AppColors.mainPink,
+                    color: AppColors.lightPink,
                     minWidth: double.infinity,
                     height: 40.h,
                     child: Text(

@@ -1,5 +1,7 @@
 import 'package:chatify/features/contacts/logic/contacts_cubit/cubit/contacts_cubit.dart';
 import 'package:chatify/features/contacts/ui/contacts_screen.dart';
+import 'package:chatify/features/user_chat/user_chat_screen.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 
 import '../features/login/logic/authentication_cubit/authentication_cubit.dart';
 import '../features/login/ui/login_screen.dart';
@@ -40,6 +42,11 @@ class AppRouter {
             create: (context) => ContactsCubit(),
             child: const ContactsScreen(),
           ),
+        );
+      case Routes.userChatScreen:
+        final contact = settings.arguments as Contact;
+        return MaterialPageRoute(
+          builder: (context) => UserChatScreen(contact: contact),
         );
       default:
         null;

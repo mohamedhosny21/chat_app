@@ -1,9 +1,10 @@
-import 'package:chatify/constants/dimensions.dart';
 import 'package:chatify/constants/strings.dart';
 import 'package:chatify/constants/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/contact.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../../../../app_router/routes.dart';
 
 class ContactItem extends StatelessWidget {
   final Contact contact;
@@ -11,18 +12,20 @@ class ContactItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          children: [
-            CircleAvatar(
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, Routes.userChatScreen, arguments: contact);
+      },
+      child: Column(
+        children: [
+          ListTile(
+            leading: CircleAvatar(
               radius: 30.r,
               child: contact.photo != null
                   ? Image.asset(contact.photo.toString())
                   : Image.asset(AppConstants.defaultUserPhoto),
             ),
-            AppDimensions.horizontalSpacing8,
-            Text(
+            title: Text(
               contact.displayName.isNotEmpty
                   ? contact.displayName
                   : contact.phones
@@ -30,10 +33,10 @@ class ContactItem extends StatelessWidget {
                           devicePhoneNumber.normalizedNumber)
                       .toString(),
               style: AppStyles.font25BlackBold.copyWith(fontSize: 16.sp),
-            )
-          ],
-        )
-      ],
+            ),
+          )
+        ],
+      ),
     );
   }
 }
