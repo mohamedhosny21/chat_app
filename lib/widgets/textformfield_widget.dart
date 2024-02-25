@@ -33,13 +33,14 @@ class AppTextFormField extends StatelessWidget {
           FocusManager.instance.primaryFocus!.unfocus();
         },
         controller: controller,
+        maxLines: null,
         decoration: InputDecoration(
           contentPadding: EdgeInsets.symmetric(
-            vertical: (height - 14.h) /
+            vertical: (height - 30.h) /
                 2, // Adjust based on font size and container height
           ),
           hintText: hintText,
-          hintStyle: AppStyles.font14Grey600Weight.copyWith(height: 1.5.h),
+          hintStyle: AppStyles.font14Grey600Weight.copyWith(height: 2.8.h),
           border: InputBorder.none,
           prefixIcon: Icon(
             prefixIcon,
