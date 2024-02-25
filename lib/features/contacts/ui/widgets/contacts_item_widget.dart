@@ -1,4 +1,4 @@
-import 'package:chatify/constants/strings.dart';
+import 'package:chatify/constants/constants.dart';
 import 'package:chatify/constants/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/contact.dart';
@@ -8,13 +8,17 @@ import '../../../../app_router/routes.dart';
 
 class ContactItem extends StatelessWidget {
   final Contact contact;
-  const ContactItem({super.key, required this.contact});
+  final String contactId;
+  const ContactItem(
+      {super.key, required this.contact, required this.contactId});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, Routes.userChatScreen, arguments: contact);
+        Navigator.pushNamed(context, Routes.userChatScreen,
+            arguments: {"contact": contact, "contactId": contactId});
+        debugPrint(contactId);
       },
       child: Column(
         children: [

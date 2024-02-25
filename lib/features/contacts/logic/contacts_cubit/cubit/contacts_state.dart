@@ -7,9 +7,11 @@ final class ContactsInitial extends ContactsState {}
 final class ContactsLoadingState extends ContactsState {}
 
 final class ContactsLoadedState extends ContactsState {
-  final List<Contact> contacts;
+  final List<Contact> filteredContacts;
+  final List<String> filteredContactsId;
 
-  ContactsLoadedState({required this.contacts});
+  ContactsLoadedState(
+      {required this.filteredContacts, required this.filteredContactsId});
 }
 
 final class ContactsErrorState extends ContactsState {

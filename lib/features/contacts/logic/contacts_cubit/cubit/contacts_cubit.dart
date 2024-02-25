@@ -1,3 +1,4 @@
+import 'package:chatify/constants/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,7 +10,6 @@ part 'contacts_state.dart';
 
 class ContactsCubit extends Cubit<ContactsState> {
   ContactsCubit() : super(ContactsInitial());
-  final database = FirebaseFirestore.instance;
 
   Future<List<Contact>> showFilteredContacts() async {
     try {
@@ -25,7 +25,8 @@ class ContactsCubit extends Cubit<ContactsState> {
             withPhoto: true, withProperties: true);
 
         // Extract phone numbers from device contacts
-        final devicePhoneNumbers = extractPhoneNumbers(deviceContacts);
+        final devicePhoneNumbers =
+            extractPhoneNumbersFromDeviceContacts(deviceContacts);
         // Split phone numbers into chunks
         final chunks = splitPhoneNumbersIntoChunks(devicePhoneNumbers);
         // Get filtered contacts based on phone number chunks
@@ -40,7 +41,8 @@ class ContactsCubit extends Cubit<ContactsState> {
     }
   }
 
-  List<String> extractPhoneNumbers(List<Contact> deviceContacts) {
+  List<String> extractPhoneNumbersFromDeviceContacts(
+      List<Contact> deviceContacts) {
     return deviceContacts
         .expand((contact) =>
             contact.phones.map((phoneNumber) => phoneNumber.normalizedNumber))
@@ -78,33 +80,57 @@ class ContactsCubit extends Cubit<ContactsState> {
   Future<List<Contact>> getFilteredContacts(
       List<List<String>> chunks, List<Contact> deviceContacts) async {
     final String loggedPhoneNumber =
-        await AppSharedPreferences.getPhoneNumberFromSharedPrefs();
+        await AppSharedPreferences.getSavedPhoneNumber();
     debugPrint('logged phone : $loggedPhoneNumber');
-    // Query Firestore for each chunk
     List<Contact> filteredContacts = [];
+    // Query Firestore for each chunk
     for (final chunk in chunks) {
       //get the documents that matches the value of field phone_number with the numbers in each chunk
-      QuerySnapshot existingPhoneNumbers = await database
+      QuerySnapshot phoneNumberQueryResult = await AppConstants.database
           .collection("Users")
           .where("phone_number", whereIn: chunk)
           .get();
 
+      //add the device contacts that has no empty phone numbers and without my logged number then checks these filtered numbers with phone numbers in firestore
       filteredContacts.addAll(deviceContacts.where((contact) {
-        // Check if the contact has at least one phone number
         if (contact.phones.isNotEmpty &&
             contact.phones.first.normalizedNumber != loggedPhoneNumber) {
-          //after getting the document above.it extracts the data from it
-          return existingPhoneNumbers.docs.any((doc) =>
+          return phoneNumberQueryResult.docs.any((doc) =>
               doc['phone_number'] == contact.phones.first.normalizedNumber);
         }
         return false;
       }).toList());
     }
-    emit(ContactsLoadedState(contacts: filteredContacts));
-    debugPrint(filteredContacts
-        .map((e) => e.phones.map((e) => e.normalizedNumber))
-        .toString());
+    final filteredContactId = await getFilteredContactsId(filteredContacts);
+
+    emit(ContactsLoadedState(
+        filteredContactsId: filteredContactId,
+        filteredContacts: filteredContacts));
+
     return filteredContacts;
+  }
+
+  Future<List<String>> getFilteredContactsId(
+      List<Contact> filteredContacts) async {
+    final allUsersDocuments =
+        await AppConstants.database.collection("Users").get();
+    List<String> filteredPhoneNumbers = filteredContacts
+        .expand(
+            (contact) => contact.phones.map((phone) => phone.normalizedNumber))
+        .toList();
+// filters the documents from the "Users" collection based on whether their 'phone_number' is in the filteredPhoneNumbers list, and then it extracts the id of each matching document
+    List<String> matchedContactIds = [];
+
+    for (String filterPhoneNumber in filteredPhoneNumbers) {
+      // Find the document with the matching phone number
+      var matchingDocument = allUsersDocuments.docs
+          .firstWhere((doc) => doc['phone_number'] == filterPhoneNumber);
+      matchedContactIds.add(matchingDocument.id);
+      // If a matching document is found, add its ID to the list
+    }
+    debugPrint(matchedContactIds.toString());
+    debugPrint(filteredPhoneNumbers.toString());
+    return matchedContactIds;
   }
 }
  /****************Example for chunk Calcuation***************/

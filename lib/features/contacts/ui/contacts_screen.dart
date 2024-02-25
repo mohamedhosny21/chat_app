@@ -59,8 +59,11 @@ class _ContactsScreenState extends State<ContactsScreen> {
               separatorBuilder: (context, index) =>
                   AppDimensions.verticalSpacing16,
               itemBuilder: (context, index) {
-                if (state.contacts.isNotEmpty) {
-                  return ContactItem(contact: state.contacts[index]);
+                if (state.filteredContacts.isNotEmpty) {
+                  return ContactItem(
+                    contact: state.filteredContacts[index],
+                    contactId: state.filteredContactsId[index],
+                  );
                 } else {
                   return Center(
                     child: Text(
@@ -70,7 +73,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                   );
                 }
               },
-              itemCount: state.contacts.length,
+              itemCount: state.filteredContacts.length,
             ),
           );
         } else {
