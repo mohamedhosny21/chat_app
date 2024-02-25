@@ -1,16 +1,15 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:chatify/widgets/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../constants/strings.dart';
+import '../../../../constants/constants.dart';
 
 part 'authentication_state.dart';
 
 class AuthenticationCubit extends Cubit<AuthenticationState> {
   final GlobalKey<FormState> phoneAuthFormKey = GlobalKey<FormState>();
   final GlobalKey<FormState> pinFormKey = GlobalKey<FormState>();
-  final database = FirebaseFirestore.instance;
   AuthenticationCubit() : super(AuthenticationInitial());
 
   Future<void> loginWithPhoneNumber(String phoneNumber) async {
@@ -73,6 +72,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
         verificationId: verificationId, smsCode: smsCode);
     debugPrint('verificationId : $verificationId');
     await signIn(phoneAuthCredential);
+    await getloggedUserId();
   } // Create new user
 
   void createNewUser({required String phoneNumber}) async {
@@ -83,7 +83,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
         "phone_number": phoneNumber,
         "photo": AppConstants.defaultUserPhoto
       };
-      database.collection("Users").add(user).then(
+      AppConstants.database.collection("Users").add(user).then(
           (doc) => debugPrint('DocumentSnapshot added with ID: ${doc.id}'));
       emit(USerCreationState());
     }
@@ -91,11 +91,24 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
 
   // Check if user exists by phone number
   Future<bool> checkUserExists(String phoneNumber) async {
-    final existingUserQuery = await database
+    final existingUserQuery = await AppConstants.database
         .collection("Users")
         .where("phone_number", isEqualTo: phoneNumber)
         .get();
-
     return existingUserQuery.docs.isNotEmpty;
+  }
+
+  Future<String> getloggedUserId() async {
+    final String loggedPhoneNumber =
+        await AppSharedPreferences.getSavedPhoneNumber();
+    final documentsQuery = await AppConstants.database
+        .collection("Users")
+        .where("phone_number", isEqualTo: loggedPhoneNumber)
+        .get();
+    final String loggedUserId = documentsQuery.docs.first.id;
+    AppSharedPreferences.saveLoggedUserId(loggedUserId);
+    debugPrint('logged User Id : $loggedUserId');
+
+    return loggedUserId;
   }
 }
