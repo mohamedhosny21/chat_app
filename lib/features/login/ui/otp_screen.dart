@@ -101,6 +101,8 @@ class OtpScreen extends StatelessWidget {
         cursorColor: AppColors.mainBlack,
         keyboardType: TextInputType.number,
         pinTheme: PinTheme(
+          fieldWidth: 40.w,
+          fieldHeight: 50.h,
           activeColor: Colors.green,
           inactiveColor: AppColors.lightPink,
           selectedColor: Colors.blue,
@@ -118,8 +120,7 @@ class OtpScreen extends StatelessWidget {
         } else if (state is LoginSuccessState) {
           Navigator.pop(context);
 
-          AppSharedPreferences.savePhoneNumberInSharedPrefs(
-              phoneNumber.completeNumber);
+          AppSharedPreferences.savePhoneNumber(phoneNumber.completeNumber);
           context
               .read<AuthenticationCubit>()
               .createNewUser(phoneNumber: phoneNumber.completeNumber);
