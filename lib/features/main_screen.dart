@@ -14,8 +14,8 @@ class NavBarPages extends StatefulWidget {
 
 class _NavBarPagesState extends State<NavBarPages> {
   final List<Widget> pages = [
-    BlocProvider<AuthenticationCubit>(
-      create: (context) => AuthenticationCubit(),
+    BlocProvider<AuthenticationCubit>.value(
+      value: AuthenticationCubit(),
       child: const ChatsScreen(),
     ),
     const CallsScreen(),
