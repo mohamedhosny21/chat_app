@@ -4,8 +4,9 @@ import 'package:chatify/features/user_chat/data/user_chat_model.dart';
 import 'package:chatify/features/user_chat/logic/cubit/messages_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'package:flutter_chat_bubble/chat_bubble.dart';
 
 class UserChatItem extends StatelessWidget {
   final Message message;

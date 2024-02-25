@@ -3,7 +3,7 @@ import 'package:chatify/constants/dimensions.dart';
 import 'package:chatify/constants/styles.dart';
 import 'package:chatify/features/user_chat/data/user_chat_model.dart';
 import 'package:chatify/features/user_chat/logic/cubit/messages_cubit.dart';
-import 'package:chatify/features/user_chat/widgets/user_chat_item_widget.dart';
+import 'package:chatify/features/user_chat/ui/widgets/user_chat_item_widget.dart';
 import 'package:chatify/widgets/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +12,7 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../widgets/textformfield_widget.dart';
+import '../../../widgets/textformfield_widget.dart';
 
 class UserChatScreen extends StatefulWidget {
   final Contact contact;
