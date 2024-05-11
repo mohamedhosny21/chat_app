@@ -1,13 +1,17 @@
-import 'package:chatify/widgets/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../constants/constants.dart';
+import '../../../../core/app_router/routes.dart';
+import '../../../../core/helpers/constants.dart';
 
 part 'authentication_state.dart';
 
 class AuthenticationCubit extends Cubit<AuthenticationState> {
+  final firestoreDatabase = FirebaseFirestore.instance;
+  final currentUser = FirebaseAuth.instance.currentUser;
+
   final GlobalKey<FormState> phoneAuthFormKey = GlobalKey<FormState>();
   final GlobalKey<FormState> pinFormKey = GlobalKey<FormState>();
   AuthenticationCubit() : super(AuthenticationInitial());
@@ -72,43 +76,41 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
         verificationId: verificationId, smsCode: smsCode);
     debugPrint('verificationId : $verificationId');
     await signIn(phoneAuthCredential);
-    await getloggedUserId();
+    // await getloggedUserId();
   } // Create new user
 
   void createNewUser({required String phoneNumber}) async {
-    final userExists = await checkUserExists(phoneNumber);
+    final newUser = <String, dynamic>{
+      "phone_number": phoneNumber,
+      "photo": AppConstants.defaultUserPhoto
+    };
+    FirebaseAuth.instance.authStateChanges().listen((currentUser) async {
+      debugPrint(currentUser?.uid);
+      await firestoreDatabase
+          .collection("Users")
+          .doc(currentUser!.uid)
+          .set(newUser);
+      emit(UserCreationState());
+    });
+  }
 
-    if (!userExists) {
-      final user = <String, dynamic>{
-        "phone_number": phoneNumber,
-        "photo": AppConstants.defaultUserPhoto
-      };
-      AppConstants.database.collection("Users").add(user).then(
-          (doc) => debugPrint('DocumentSnapshot added with ID: ${doc.id}'));
-      emit(USerCreationState());
+  Future<bool> checkUserExists() async {
+    final existingUserQuery =
+        await firestoreDatabase.collection("Users").doc(currentUser?.uid).get();
+    return existingUserQuery.exists;
+  }
+
+  Future<String> getInitialRoute() async {
+    String initialRoute = Routes.loginScreen;
+
+    if (currentUser != null) {
+      bool userExists = await checkUserExists();
+      if (!userExists) {
+        await FirebaseAuth.instance.signOut();
+      } else {
+        initialRoute = Routes.homeScreen;
+      }
     }
-  }
-
-  // Check if user exists by phone number
-  Future<bool> checkUserExists(String phoneNumber) async {
-    final existingUserQuery = await AppConstants.database
-        .collection("Users")
-        .where("phone_number", isEqualTo: phoneNumber)
-        .get();
-    return existingUserQuery.docs.isNotEmpty;
-  }
-
-  Future<String> getloggedUserId() async {
-    final String loggedPhoneNumber =
-        await AppSharedPreferences.getSavedPhoneNumber();
-    final documentsQuery = await AppConstants.database
-        .collection("Users")
-        .where("phone_number", isEqualTo: loggedPhoneNumber)
-        .get();
-    final String loggedUserId = documentsQuery.docs.first.id;
-    AppSharedPreferences.saveLoggedUserId(loggedUserId);
-    debugPrint('logged User Id : $loggedUserId');
-
-    return loggedUserId;
+    return initialRoute;
   }
 }
