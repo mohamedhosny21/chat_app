@@ -1,5 +1,9 @@
+import 'package:chatify/core/dependency_injection/dependency_injection.dart';
+import 'package:chatify/features/chats/logic/cubit/chat_cubit.dart';
+import 'package:chatify/features/groups/ui/groups_screen.dart';
+
 import 'calls/calls_screen.dart';
-import 'chats/chats_screen.dart';
+import 'chats/ui/screens/chats_screen.dart';
 import 'login/logic/authentication_cubit/authentication_cubit.dart';
 import 'profile/profile_screen.dart';
 import 'package:flutter/material.dart';
@@ -14,10 +18,18 @@ class NavBarPages extends StatefulWidget {
 
 class _NavBarPagesState extends State<NavBarPages> {
   final List<Widget> pages = [
-    BlocProvider<AuthenticationCubit>.value(
-      value: AuthenticationCubit(),
+    MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthenticationCubit>(
+          create: (context) => getIt<AuthenticationCubit>(),
+        ),
+        BlocProvider<ChatCubit>(
+          create: (context) => getIt<ChatCubit>(),
+        ),
+      ],
       child: const ChatsScreen(),
     ),
+    const GroupsScreen(),
     const CallsScreen(),
     const ProfileScreen()
   ];
