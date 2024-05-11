@@ -1,17 +1,15 @@
-import 'package:chatify/widgets/shared_preferences.dart';
-
-import '../../../../constants/colors.dart';
-import '../../../../constants/dimensions.dart';
-import '../../../../constants/styles.dart';
+import '../../../core/theming/colors.dart';
+import '../../../core/helpers/dimensions.dart';
+import '../../../core/theming/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl_phone_field/phone_number.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
-import '../../../../app_router/routes.dart';
-import '../../../widgets/circular_progress_indicator.dart';
-import '../../../widgets/snackbar.dart';
+import '../../../core/app_router/routes.dart';
+import '../../../core/helpers/circular_progress_indicator.dart';
+import '../../../core/helpers/snackbar.dart';
 import '../logic/authentication_cubit/authentication_cubit.dart';
 
 // ignore: must_be_immutable
@@ -120,12 +118,11 @@ class OtpScreen extends StatelessWidget {
         } else if (state is LoginSuccessState) {
           Navigator.pop(context);
 
-          AppSharedPreferences.savePhoneNumber(phoneNumber.completeNumber);
           context
               .read<AuthenticationCubit>()
               .createNewUser(phoneNumber: phoneNumber.completeNumber);
-          Navigator.of(context)
-              .pushNamedAndRemoveUntil(Routes.homeScreen, (route) => false);
+          Navigator.pushNamedAndRemoveUntil(
+              context, Routes.homeScreen, (route) => false);
         } else if (state is LoginFailedState) {
           Navigator.pop(context);
           showErrorSnackBar(context, state.errorMsg);

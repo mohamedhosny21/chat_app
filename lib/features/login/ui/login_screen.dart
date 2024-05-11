@@ -1,15 +1,15 @@
-import '../../../../constants/colors.dart';
-import '../../../../constants/dimensions.dart';
-import '../../../../constants/styles.dart';
+import '../../../core/theming/colors.dart';
+import '../../../core/helpers/dimensions.dart';
+import '../../../core/theming/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
 
-import '../../../../app_router/routes.dart';
-import '../../../widgets/circular_progress_indicator.dart';
-import '../../../widgets/snackbar.dart';
+import '../../../core/app_router/routes.dart';
+import '../../../core/helpers/circular_progress_indicator.dart';
+import '../../../core/helpers/snackbar.dart';
 import '../logic/authentication_cubit/authentication_cubit.dart';
 
 // ignore: must_be_immutable
@@ -93,7 +93,7 @@ class LoginScreen extends StatelessWidget {
           showCircularProgressIndicator(context);
         } else if (state is PhoneNumberSubmittedState) {
           Navigator.pop(context);
-          Navigator.of(context).pushNamed(Routes.otpScreen, arguments: {
+          Navigator.pushNamed(context, Routes.otpScreen, arguments: {
             'phone_number': phoneNumber,
             'verification_ID': state.verificationId
           });
