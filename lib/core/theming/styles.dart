@@ -47,4 +47,7 @@ class AppStyles {
 
   static TextStyle font15White500Weight = TextStyle(
       fontSize: 15.sp, color: Colors.white, fontWeight: FontWeight.w500);
+
+  static TextStyle font10WhiteBold = TextStyle(
+      fontSize: 10.sp, color: Colors.white, fontWeight: FontWeight.bold);
 }
