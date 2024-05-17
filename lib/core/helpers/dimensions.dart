@@ -17,6 +17,10 @@ class AppDimensions {
       EdgeInsetsDirectional.symmetric(horizontal: 50.w, vertical: 50.h);
   static EdgeInsetsGeometry paddingSymmetricV25H100 =
       EdgeInsetsDirectional.symmetric(horizontal: 100.w, vertical: 25.h);
+  static EdgeInsetsGeometry paddingSymmetricH5 =
+      EdgeInsetsDirectional.symmetric(
+    horizontal: 5.w,
+  );
 
   /* *************** Vertical Sized Box  ***************** */
   static SizedBox verticalSpacing20 = SizedBox(
@@ -40,12 +44,15 @@ class AppDimensions {
   /* *************** Horizontal Sized Box  ***************** */
 
   static SizedBox horizontalSpacing15 = SizedBox(
-    width: 15.h,
+    width: 15.w,
   );
   static SizedBox horizontalSpacing100 = SizedBox(
-    width: 100.h,
+    width: 100.w,
   );
   static SizedBox horizontalSpacing8 = SizedBox(
-    width: 8.h,
+    width: 8.w,
+  );
+  static SizedBox horizontalSpacing5 = SizedBox(
+    width: 5.w,
   );
 }
