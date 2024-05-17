@@ -8,8 +8,8 @@ import 'package:uuid/uuid.dart';
 
 import '../../../../core/helpers/constants.dart';
 import '../../../contacts/data/contact_model.dart';
-import '../message_model.dart';
-import '../ongoing_chat_model.dart';
+import '../models/message_model.dart';
+import '../models/ongoing_chat_model.dart';
 
 class ChatRepository {
   final _firestoreDatabase = FirebaseFirestore.instance;
@@ -43,7 +43,7 @@ class ChatRepository {
         type: 'text',
         status: 'sent',
         isDeleted: false,
-        time: Timestamp.now().toString());
+        time: Timestamp.now());
     debugPrint('reee  + ${newMessage.receiverId}');
 
     final doc = await _firestoreDatabase
@@ -52,13 +52,53 @@ class ChatRepository {
         .collection("Messages")
         .add(newMessage.toMap());
 
-    // getMessages();
     _addChatModelToDatabase(contact: contact, mostRecentMessage: newMessage);
 
     debugPrint('message id : ${doc.id}');
   }
 
-  void updateDeletedMessages(String messageId) {
+  void _updateDeletedOnGoingMessagesForSender(String messageId) {
+    _firestoreDatabase
+        .collection("OngoingChats")
+        .doc(currentUser!.uid)
+        .collection("Conversations")
+        .where('lastMessageId', isEqualTo: messageId)
+        .limit(1)
+        .snapshots()
+        .listen((querySnapshot) {
+      _firestoreDatabase
+          .collection("OngoingChats")
+          .doc(currentUser!.uid)
+          .collection("Conversations")
+          .doc(querySnapshot.docs.first.id)
+          .update({'isLastMessageDeleted': true});
+    }, onError: (error) {
+      throw Exception(error);
+    });
+  }
+
+  void _updateDeletedOnGoingMessagesForReceiver(
+      String messageId, String receiverId) {
+    _firestoreDatabase
+        .collection("OngoingChats")
+        .doc(receiverId)
+        .collection("Conversations")
+        .where('lastMessageId', isEqualTo: messageId)
+        .limit(1)
+        .snapshots()
+        .listen((querySnapshot) {
+      _firestoreDatabase
+          .collection("OngoingChats")
+          .doc(receiverId)
+          .collection("Conversations")
+          .doc(querySnapshot.docs.first.id)
+          .update({'isLastMessageDeleted': true});
+    }, onError: (error) {
+      throw Exception(error);
+    });
+  }
+
+  void updateDeletedMessages(String messageId, String receiverId) {
     deletedMessagesSubscription = _firestoreDatabase
         .collection("Chat_Rooms")
         .doc(chatId)
@@ -75,9 +115,30 @@ class ChatRepository {
     }, onError: (error) {
       throw Exception(error);
     });
+    _updateDeletedOnGoingMessagesForSender(messageId);
+    _updateDeletedOnGoingMessagesForReceiver(messageId, receiverId);
   }
 
-  void updateMessageStatus(String messageId, String status) {
+  void updateOngoingMessageStatus(String messageId, String status) {
+    //update status for other user
+    String peerUserId =
+        chatId.replaceAll(currentUser!.uid, '').replaceAll('_', '');
+    _firestoreDatabase
+        .collection("OngoingChats")
+        .doc(peerUserId)
+        .collection("Conversations")
+        .doc(chatId)
+        .update({'lastMessageStatus': status});
+    //update status for current user
+    _firestoreDatabase
+        .collection("OngoingChats")
+        .doc(currentUser!.uid)
+        .collection("Conversations")
+        .doc(chatId)
+        .update({'lastMessageStatus': status});
+  }
+
+  void updateMessageStatus(String messageId, String status) async {
     updatedMessagesStatusSubscription = _firestoreDatabase
         .collection("Chat_Rooms")
         .doc(chatId)
@@ -92,23 +153,59 @@ class ChatRepository {
           .collection("Messages")
           .doc(querySnapshot.docs.first.id)
           .update({"status": status});
+      updateOngoingMessageStatus(
+        messageId,
+        status,
+      );
     }, onError: (error) {
       throw Exception(error);
     });
   }
 
+  Future<int> _getUnreadMessagesCount(String receiverId) async {
+    //Completer : handle asynchronous operations. It provides a way to produce values that will be available in the future.
+    final Completer<int> completer = Completer<int>();
+
+    final StreamSubscription<QuerySnapshot> unreadMessagesSubscription =
+        _firestoreDatabase
+            .collection("Chat_Rooms")
+            .doc(chatId)
+            .collection("Messages")
+            .where('receiverId', isEqualTo: receiverId)
+            .where('status', isNotEqualTo: 'seen')
+            .snapshots()
+            .listen((unreadMessagesCountSnapshots) {
+      final int unreadMessagesCount = unreadMessagesCountSnapshots.size;
+      //When unreadMessagesCount has the value , we complete the Completer with that count. This makes the count available as the future's value.
+      completer.complete(unreadMessagesCount);
+    });
+//we pause the execution of _addReceiverChatModelToDatabase until the future is completed.
+    final int unreadMessagesCount = await completer.future;
+
+    unreadMessagesSubscription.cancel();
+
+    return unreadMessagesCount;
+  }
+
+  void resetUnreadMessagesCount() {
+    _firestoreDatabase
+        .collection("OngoingChats")
+        .doc(currentUser!.uid)
+        .collection("Conversations")
+        .doc(chatId)
+        .update({'unreadMessagesCount': 0});
+  }
+
   void _addSenderChatModelToDatabase(
       {required ContactModel contact,
       required Message mostRecentMessage}) async {
-    final OnGoingChat senderOnGoingChatModel = OnGoingChat(
-        id: contact.id,
-        phoneNumber: contact.phoneNumber,
-        profilePicture: contact.profilePicture ?? AppConstants.defaultUserPhoto,
-        lastMessage: mostRecentMessage.text,
-        lastMessageTime: mostRecentMessage.time,
-        lastMessageStatus: mostRecentMessage.status,
-        lastMessageType: mostRecentMessage.type,
-        isLastMessageDeleted: mostRecentMessage.isDeleted);
+    final OnGoingChat senderOnGoingChatModel = OnGoingChat.fromSenderData(
+      contact: contact,
+      id: contact.id,
+      phoneNumber: contact.phoneNumber,
+      profilePicture: contact.profilePicture ?? AppConstants.defaultUserPhoto,
+      mostRecentMessage: mostRecentMessage,
+    );
 
     await _firestoreDatabase
         .collection("OngoingChats")
@@ -123,28 +220,25 @@ class ChatRepository {
   void _addReceiverChatModelToDatabase(
       {required ContactModel contact,
       required Message mostRecentMessage}) async {
-    final OnGoingChat receiverOnGoingChatModel = OnGoingChat(
+    final int unreadMessagesCount = await _getUnreadMessagesCount(contact.id);
+
+    final OnGoingChat receiverOnGoingChatModel = OnGoingChat.fromReceiverData(
         id: currentUser!.uid,
         phoneNumber: currentUser!.phoneNumber!,
         profilePicture: currentUser!.photoURL ?? AppConstants.defaultUserPhoto,
-        lastMessage: mostRecentMessage.text,
-        lastMessageTime: mostRecentMessage.time,
-        lastMessageStatus: mostRecentMessage.status,
-        lastMessageType: mostRecentMessage.type,
-        isLastMessageDeleted: mostRecentMessage.isDeleted);
+        mostRecentMessage: mostRecentMessage,
+        unreadMessagesCount: unreadMessagesCount);
+
     await _firestoreDatabase
         .collection("OngoingChats")
-        .doc(
-          contact.id,
-        )
+        .doc(contact.id)
         .collection("Conversations")
         .doc(chatId)
         .set(receiverOnGoingChatModel.toMap());
   }
 
   void _addChatModelToDatabase(
-      {required ContactModel contact,
-      required Message mostRecentMessage}) async {
+      {required ContactModel contact, required Message mostRecentMessage}) {
     _addSenderChatModelToDatabase(
         contact: contact, mostRecentMessage: mostRecentMessage);
     _addReceiverChatModelToDatabase(
@@ -154,7 +248,7 @@ class ChatRepository {
   Future<List<Contact>> getDeviceContacts() async {
     final requestPermission = await FlutterContacts.requestPermission();
     if (requestPermission) {
-      return FlutterContacts.getContacts(withProperties: true);
+      return await FlutterContacts.getContacts(withProperties: true);
     }
     throw Exception('Permission Denied');
   }

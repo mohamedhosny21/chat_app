@@ -20,11 +20,13 @@ class ChatsScreen extends StatefulWidget {
 }
 
 class _ChatsScreenState extends State<ChatsScreen> {
+  late ChatCubit chatCubit;
   @override
   void initState() {
     super.initState();
-    context.read<ChatCubit>().getOnGoingChats();
-    context.read<ChatCubit>().listenToContacts();
+    chatCubit = context.read<ChatCubit>();
+    chatCubit.getOnGoingChats();
+    chatCubit.listenToContacts();
   }
 
   // @override
@@ -83,32 +85,36 @@ class _ChatsScreenState extends State<ChatsScreen> {
           )),
     );
   }
-}
 
-Widget _buildChatsList() {
-  return Expanded(
-    child: BlocBuilder<ChatCubit, ChatState>(
-      builder: (context, state) {
-        if (state is OnGoingChatsLoadedState) {
-          if (state.onGoingChats.isNotEmpty) {
-            return ListView.separated(
-              itemBuilder: (context, index) => ChatItem(
-                ongoingChat: state.onGoingChats[index],
+  Widget _buildChatsList() {
+    return Expanded(
+      child: BlocBuilder<ChatCubit, ChatState>(
+        builder: (context, state) {
+          if (state is OnGoingChatsLoadedState) {
+            if (state.onGoingChats.isNotEmpty) {
+              return ListView.separated(
+                itemBuilder: (context, index) => GestureDetector(
+                  child: ChatItem(
+                    onGoingChat: state.onGoingChats[index],
+                    isSentByMe: state.onGoingChats[index].lastMessageSenderId ==
+                        chatCubit.currentUser!.uid,
+                  ),
+                ),
+                separatorBuilder: (context, index) =>
+                    AppDimensions.verticalSpacing16,
+                itemCount: state.onGoingChats.length,
+              );
+            }
+            return Center(
+              child: Text(
+                'No Chats',
+                style: AppStyles.font25GreyBold,
               ),
-              separatorBuilder: (context, index) =>
-                  AppDimensions.verticalSpacing16,
-              itemCount: state.onGoingChats.length,
             );
           }
-          return Center(
-            child: Text(
-              'No Chats',
-              style: AppStyles.font25GreyBold,
-            ),
-          );
-        }
-        return const SizedBox();
-      },
-    ),
-  );
+          return const SizedBox();
+        },
+      ),
+    );
+  }
 }

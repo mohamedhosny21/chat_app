@@ -1,12 +1,12 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:chatify/core/helpers/dimensions.dart';
+import 'package:chatify/features/chats/ui/widgets/chats_shared_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:chatify/core/theming/colors.dart';
 import 'package:chatify/core/theming/styles.dart';
-import 'package:chatify/features/chats/data/message_model.dart';
+import 'package:chatify/features/chats/data/models/message_model.dart';
 import 'package:chatify/features/chats/logic/cubit/chat_cubit.dart';
 
 class MessageItem extends StatelessWidget {
@@ -23,9 +23,14 @@ class MessageItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!isSentByMe) {
-      chatCubit.updateMessageStatus(message.id, 'seen');
+    if (!isSentByMe && message.status != 'seen') {
+      chatCubit.updateMessageStatus(
+        message.id,
+        'seen',
+      );
+      chatCubit.resetUnreadMessagesCount();
     }
+
     return Column(
       children: [
         Row(
@@ -56,7 +61,7 @@ class MessageItem extends StatelessWidget {
                   : BubbleType.receiverBubble),
           backGroundColor: isSentByMe ? AppColors.darkPink : Colors.white,
           child: message.isDeleted
-              ? _buildDeletedMessageWidget()
+              ? buildDeletedMessageWidget(isSentByMe: isSentByMe, iconSize: 20)
               : Container(
                   // to avoid the overflow of text
                   constraints: BoxConstraints(maxWidth: 250.w),
@@ -82,7 +87,7 @@ class MessageItem extends StatelessWidget {
         PopupMenuItem(
             onTap: () {
               if (isSentByMe) {
-                chatCubit.updateDeletedMessages(message.id);
+                chatCubit.updateDeletedMessages(message.id, message.receiverId);
               }
             },
             height: 30.h,
@@ -98,8 +103,7 @@ class MessageItem extends StatelessWidget {
 
   Widget _buildMessageTime() {
     //convert firestore timestamp into readable time in hours and minutes
-    int seconds = int.parse(message.time.split(',')[0].split('=')[1]);
-    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(seconds * 1000);
+    DateTime dateTime = message.time.toDate();
     return Align(
       alignment: isSentByMe ? Alignment.centerLeft : Alignment.centerRight,
       child: Text(
@@ -145,25 +149,6 @@ class MessageItem extends StatelessWidget {
         color: color,
         size: 15.0.w,
       ),
-    );
-  }
-
-  Widget _buildDeletedMessageWidget() {
-    return Row(
-      children: [
-        Icon(
-          Icons.do_disturb,
-          size: 20.w,
-          color: isSentByMe ? Colors.white : AppColors.mainBlack,
-        ),
-        AppDimensions.horizontalSpacing8,
-        Text(
-          'Message has been deleted',
-          style: isSentByMe
-              ? AppStyles.font15White500Weight
-              : AppStyles.font15Black500Weight,
-        ),
-      ],
     );
   }
 }

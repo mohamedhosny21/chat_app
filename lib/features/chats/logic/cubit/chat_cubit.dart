@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:chatify/features/chats/data/message_model.dart';
-import 'package:chatify/features/chats/data/ongoing_chat_model.dart';
+import 'package:chatify/features/chats/data/models/message_model.dart';
+import 'package:chatify/features/chats/data/models/ongoing_chat_model.dart';
 import 'package:chatify/features/chats/data/repository/chat_repository.dart';
 import 'package:chatify/features/contacts/data/contact_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -51,12 +51,19 @@ class ChatCubit extends Cubit<ChatState> {
     });
   }
 
-  void updateDeletedMessages(String messageId) {
-    _chatRepository.updateDeletedMessages(messageId);
+  void updateDeletedMessages(String messageId, String receiverId) {
+    _chatRepository.updateDeletedMessages(messageId, receiverId);
   }
 
   void updateMessageStatus(String messageId, String status) {
     _chatRepository.updateMessageStatus(messageId, status);
+  }
+
+  void updateOnGoingMessageStatus(String messageId, String status) {
+    _chatRepository.updateOngoingMessageStatus(
+      messageId,
+      status,
+    );
   }
 
   void getOnGoingChats() async {
@@ -81,6 +88,10 @@ class ChatCubit extends Cubit<ChatState> {
       }).toList();
       emit(OnGoingChatsLoadedState(onGoingChats: onGoingChats));
     });
+  }
+
+  void resetUnreadMessagesCount() {
+    _chatRepository.resetUnreadMessagesCount();
   }
 
   void listenToContacts() {

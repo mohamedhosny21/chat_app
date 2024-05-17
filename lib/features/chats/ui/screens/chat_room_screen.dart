@@ -10,7 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:grouped_list/grouped_list.dart';
 import '../../../../core/widgets/textformfield_widget.dart';
-import '../../data/message_model.dart';
+import '../../data/models/message_model.dart';
 
 class ChatRoomScreen extends StatefulWidget {
   final ContactModel contact;
@@ -186,9 +186,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   }
 
   String _getGroupLabel(Message element) {
-    int seconds = int.parse(element.time.split(',')[0].split('=')[1]);
-    final DateTime dateTime =
-        DateTime.fromMillisecondsSinceEpoch(seconds * 1000);
+    final DateTime dateTime = element.time.toDate();
     final DateTime now = DateTime.now();
     final DateTime yesterday = DateTime.now().subtract(const Duration(days: 1));
 
@@ -215,7 +213,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         padding: const EdgeInsets.only(bottom: 100),
         child: GroupedListView(
           elements: messages,
-          // groupComparator: (value1, value2) => value2.compareTo(value1),
+          groupComparator: (value1, value2) => value2.compareTo(value1),
           groupBy: (element) {
             return _getGroupLabel(element);
           },
@@ -240,7 +238,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           indexedItemBuilder: (context, element, index) => MessageItem(
             chatCubit: chatCubit,
             message: messages[index],
-            isSentByMe: chatCubit.currentUser?.uid == messages[index].senderId,
+            isSentByMe: messages[index].senderId == chatCubit.currentUser!.uid,
           ),
         ),
       );
