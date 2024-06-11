@@ -1,5 +1,5 @@
 import 'package:chatify/core/dependency_injection/dependency_injection.dart';
-import 'package:chatify/features/login/logic/authentication_cubit/authentication_cubit.dart';
+import 'package:chatify/features/login/logic/cubit/authentication_cubit.dart';
 
 import 'core/app_router/app_router.dart';
 import 'firebase_options.dart';
@@ -13,6 +13,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // await FirebaseAppCheck.instance
+  //     .activate(androidProvider: AndroidProvider.debug);
   setupGetIt();
   final initialRoute = await getIt<AuthenticationCubit>().getInitialRoute();
 

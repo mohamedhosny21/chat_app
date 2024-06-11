@@ -1,10 +1,12 @@
 import 'package:chatify/core/dependency_injection/dependency_injection.dart';
+import 'package:chatify/features/chats/ui/screens/video_message_screen.dart';
 import 'package:chatify/features/contacts/data/contact_model.dart';
 import 'package:chatify/features/contacts/logic/cubit/contacts_cubit.dart';
 import 'package:chatify/features/contacts/ui/contacts_screen.dart';
 import 'package:chatify/features/chats/logic/cubit/chat_cubit.dart';
 import 'package:chatify/features/chats/ui/screens/chat_room_screen.dart';
-import '../../features/login/logic/authentication_cubit/authentication_cubit.dart';
+import '../../features/chats/ui/screens/image_message_screen.dart';
+import '../../features/login/logic/cubit/authentication_cubit.dart';
 import '../../features/login/ui/login_screen.dart';
 import '../../features/login/ui/otp_screen.dart';
 import '../../features/main_screen.dart';
@@ -53,6 +55,23 @@ class AppRouter {
                 contact: contact,
               )),
         );
+      case Routes.videoMessageScreen:
+        final argumentData = settings.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(
+          builder: (context) => VideoMessageScreen(
+            isSentByMe: argumentData['isSentByMe'],
+            videoMessage: argumentData['videoMessage'],
+            contact: argumentData['contact'],
+          ),
+        );
+      case Routes.imageMessageScreen:
+        final argumentData = settings.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(
+            builder: (context) => ImageMessageScreen(
+                  contact: argumentData['contact'],
+                  isSentByMe: argumentData['isSentByMe'],
+                  imageMessage: argumentData['imageMessage'],
+                ));
       default:
         null;
     }
