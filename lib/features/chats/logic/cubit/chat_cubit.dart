@@ -17,6 +17,8 @@ class ChatCubit extends Cubit<ChatState> {
   final currentUser = FirebaseAuth.instance.currentUser;
 
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _messageSubscription;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
+      _onGoingMessageSubscription;
 
   final ChatRepository _chatRepository;
 
@@ -27,8 +29,15 @@ class ChatCubit extends Cubit<ChatState> {
     getMessages();
   }
 
-  Future<void> sendMessage(ContactModel contact, String messageText) async {
-    await _chatRepository.sendMessage(contact, messageText);
+  Future<void> sendMessage(
+      {required ContactModel contact,
+      required String messageText,
+      required String messageType}) async {
+    await _chatRepository.sendMessage(
+        contact: contact,
+        messageText: messageText,
+        messageType: messageType,
+        status: 'sent');
     getMessages();
   }
 
@@ -51,47 +60,46 @@ class ChatCubit extends Cubit<ChatState> {
     });
   }
 
-  void updateDeletedMessages(String messageId, String receiverId) {
-    _chatRepository.updateDeletedMessages(messageId, receiverId);
+  void updateDeletedMessages(Message message, String receiverId) {
+    _chatRepository.updateDeletedMessages(message, receiverId);
   }
 
-  void updateMessageStatus(String messageId, String status) {
-    _chatRepository.updateMessageStatus(messageId, status);
+  void updateMessageStatus(String messageId, String status) async {
+    await _chatRepository.updateMessageStatus(messageId, status);
   }
 
-  void updateOnGoingMessageStatus(String messageId, String status) {
-    _chatRepository.updateOngoingMessageStatus(
-      messageId,
-      status,
-    );
+  void deleteMessagePermanently(messageId) async {
+    await _chatRepository.deleteMessagePermanently(messageId);
   }
 
   void getOnGoingChats() async {
     final deviceContacts = await _chatRepository.getDeviceContacts();
     List<OnGoingChat> onGoingChats = [];
-    _firestoreDatabase
+    _onGoingMessageSubscription = _firestoreDatabase
         .collection("OngoingChats")
         .doc(currentUser!.uid)
         .collection("Conversations")
         .orderBy("lastMessageTime", descending: true)
         .snapshots()
-        .listen((onGoingChatsQuery) {
-      onGoingChats = onGoingChatsQuery.docs.map((doc) {
-        final data = doc.data();
-        final contact = deviceContacts.firstWhere(
-          (element) => element.phones.any(
-              (element) => element.normalizedNumber == data['phoneNumber']),
-          orElse: () => Contact(displayName: data['phoneNumber']),
-        );
+        .listen(
+      (onGoingChatsQuery) {
+        onGoingChats = onGoingChatsQuery.docs.map((doc) {
+          final data = doc.data();
+          final contact = deviceContacts.firstWhere(
+            (element) => element.phones.any(
+                (element) => element.normalizedNumber == data['phoneNumber']),
+            orElse: () => Contact(displayName: data['phoneNumber']),
+          );
 
-        return OnGoingChat.fromMap(data, contact.displayName);
-      }).toList();
-      emit(OnGoingChatsLoadedState(onGoingChats: onGoingChats));
-    });
+          return OnGoingChat.fromMap(data, contact.displayName);
+        }).toList();
+        emit(OnGoingChatsLoadedState(onGoingChats: onGoingChats));
+      },
+    );
   }
 
-  void resetUnreadMessagesCount() {
-    _chatRepository.resetUnreadMessagesCount();
+  void markMessageAsSeenAndResetUnreadCount(String messageId) async {
+    await _chatRepository.markMessageAsSeenAndResetUnreadCount(messageId);
   }
 
   void listenToContacts() {
@@ -101,11 +109,37 @@ class ChatCubit extends Cubit<ChatState> {
     });
   }
 
-  void closeListener() {
+  void pickAndSendImage(ContactModel contact) async {
+    await _chatRepository.pickAndSendImage(contact);
+    getMessages();
+  }
+
+  void pickAndSendVideo(ContactModel contact) async {
+    await _chatRepository.pickAndSendVideo(contact);
+    getMessages();
+  }
+
+  void pickAndSendDocument(ContactModel contact) async {
+    await _chatRepository.pickAndSendDocument(contact);
+    getMessages();
+  }
+
+  String extractFileNameFromUrl(String url) {
+    return _chatRepository.extractFileName(url);
+  }
+
+  void viewDocumentFile(String fileUrl) async {
+    await _chatRepository.viewDocumentFile(fileUrl);
+  }
+
+  @override
+  Future<void> close() async {
+    _chatRepository.updateMessageSnapshot?.cancel();
     _messageSubscription?.cancel();
-    _chatRepository.updatedMessagesStatusSubscription?.cancel();
-    _chatRepository.deletedMessagesSubscription?.cancel();
+    _onGoingMessageSubscription?.cancel();
     FlutterContacts.removeListener(
         () => debugPrint('Contact chat Listener removed'));
+    debugPrint('chat cubit closed');
+    return super.close();
   }
 }
