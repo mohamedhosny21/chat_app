@@ -1,10 +1,11 @@
 import 'package:chatify/core/helpers/dimensions.dart';
+import 'package:chatify/core/theming/colors.dart';
 import 'package:chatify/core/theming/styles.dart';
 import 'package:chatify/core/helpers/snackbar.dart';
+import 'package:chatify/core/widgets/back_button_widget.dart';
 import 'package:chatify/features/contacts/data/contact_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../logic/cubit/contacts_cubit.dart';
 import 'widgets/contacts_item_widget.dart';
@@ -27,18 +28,20 @@ class _ContactsScreenState extends State<ContactsScreen> {
   }
 
   @override
-  void dispose() {
-    _contactsCubit.closeListeners();
+  // void dispose() {
+  //   _contactsCubit.closeListeners();
 
-    super.dispose();
-  }
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
           backgroundColor: Colors.white,
-          leading: _appBarLeading(),
+          leading: const BackButtonWidget(
+            color: AppColors.mainBlack,
+          ),
           title: Text(
             'My Contacts',
             style: AppStyles.font18Black600Weight,
@@ -46,18 +49,6 @@ class _ContactsScreenState extends State<ContactsScreen> {
       body: RefreshIndicator(
           onRefresh: () => _contactsCubit.showFilteredContacts(),
           child: _buildContactsBlocConsumer()),
-    );
-  }
-
-  IconButton _appBarLeading() {
-    return IconButton(
-      onPressed: () {
-        Navigator.pop(context);
-      },
-      icon: const Icon(
-        Icons.arrow_back_ios_new_sharp,
-      ),
-      iconSize: 24.w,
     );
   }
 

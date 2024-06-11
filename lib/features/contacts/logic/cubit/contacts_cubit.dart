@@ -14,13 +14,11 @@ import '../../data/contact_model.dart';
 part 'contacts_state.dart';
 
 class ContactsCubit extends Cubit<ContactsState> {
-  // StreamSubscription<List<ContactModel>>? _contactsSubscription;
-
   final ContactRepository _contactRepository;
   final firestoreDatabase = FirebaseFirestore.instance;
 
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
-      _firestoreSubscription;
+      _contactsSubscription;
 
   final String loggedPhoneNumber =
       FirebaseAuth.instance.currentUser!.phoneNumber!;
@@ -74,7 +72,7 @@ class ContactsCubit extends Cubit<ContactsState> {
     required List<String> chunk,
     required List<Contact> deviceContacts,
   }) async {
-    _firestoreSubscription = firestoreDatabase
+    _contactsSubscription = firestoreDatabase
         .collection("Users")
         .where("phone_number", whereIn: chunk)
         .snapshots()
@@ -116,9 +114,12 @@ class ContactsCubit extends Cubit<ContactsState> {
     emit(ContactsLoadedState(filteredContacts: filteredContacts));
   }
 
-  void closeListeners() {
-    _firestoreSubscription?.cancel();
+  @override
+  Future<void> close() async {
+    _contactsSubscription?.cancel();
     FlutterContacts.removeListener(
         () => debugPrint('Contact Listener removed'));
+    debugPrint('contacts cubit closed');
+    return super.close();
   }
 }
