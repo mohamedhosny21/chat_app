@@ -2,6 +2,7 @@ import 'package:chatify/core/helpers/constants.dart';
 import 'package:chatify/core/theming/colors.dart';
 import 'package:chatify/core/helpers/dimensions.dart';
 import 'package:chatify/core/theming/styles.dart';
+import 'package:chatify/core/widgets/back_button_widget.dart';
 import 'package:chatify/features/contacts/data/contact_model.dart';
 import 'package:chatify/features/chats/logic/cubit/chat_cubit.dart';
 import 'package:chatify/features/chats/ui/widgets/message_item_widget.dart';
@@ -9,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:grouped_list/grouped_list.dart';
+import 'package:intl/intl.dart';
 import '../../../../core/widgets/textformfield_widget.dart';
 import '../../data/models/message_model.dart';
 
@@ -22,7 +24,7 @@ class ChatRoomScreen extends StatefulWidget {
 
 class _ChatRoomScreenState extends State<ChatRoomScreen> {
   final TextEditingController messageController = TextEditingController();
-
+  List<Message> messages = [];
   late ChatCubit chatCubit;
 
   @override
@@ -49,15 +51,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         leadingWidth: 25.w,
         scrolledUnderElevation: 0,
         backgroundColor: Colors.white,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(
-            Icons.arrow_back_ios_new_sharp,
-          ),
-          iconSize: 24.w,
-        ),
+        leading: const BackButtonWidget(color: AppColors.mainBlack),
         title: _appBarTitle(),
         actions: _appBarActions(),
       ),
@@ -77,9 +71,54 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     );
   }
 
+  void _showFileSourceActionSheet() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Column(mainAxisSize: MainAxisSize.min, children: [
+        _buildFilePickerOption(
+          icon: Icons.image,
+          title: 'Photo',
+          onTap: () {
+            Navigator.pop(context);
+            chatCubit.pickAndSendImage(
+              widget.contact,
+            );
+          },
+        ),
+        _buildFilePickerOption(
+            icon: Icons.video_collection,
+            title: 'Video',
+            onTap: () {
+              Navigator.pop(context);
+              chatCubit.pickAndSendVideo(widget.contact);
+            }),
+        _buildFilePickerOption(
+            icon: Icons.insert_drive_file_sharp,
+            title: 'Document',
+            onTap: () {
+              Navigator.pop(context);
+              chatCubit.pickAndSendDocument(widget.contact);
+            })
+      ]),
+    );
+  }
+
+  Widget _buildFilePickerOption(
+      {required IconData icon,
+      required String title,
+      required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: ListTile(
+        leading: Icon(icon, size: 25.w),
+        title: Text(title, style: AppStyles.font15Black500Weight),
+      ),
+    );
+  }
+
   IconButton _buildAddButton() {
     return IconButton(
-      onPressed: () {},
+      onPressed: () => _showFileSourceActionSheet(),
       icon: const Icon(Icons.add),
       iconSize: 24.w,
       color: AppColors.mainGrey,
@@ -99,7 +138,10 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     return IconButton(
       onPressed: () {
         if (messageController.text.isNotEmpty) {
-          chatCubit.sendMessage(widget.contact, messageController.text);
+          chatCubit.sendMessage(
+              contact: widget.contact,
+              messageText: messageController.text,
+              messageType: 'text');
 
           messageController.clear();
         }
@@ -176,7 +218,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           child: Text(
             widget.contact.name.isNotEmpty
                 ? widget.contact.name
-                : widget.contact.phoneNumber.toString(),
+                : widget.contact.phoneNumber,
             style: AppStyles.font18Black600Weight,
             overflow: TextOverflow.ellipsis,
           ),
@@ -186,22 +228,31 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   }
 
   String _getGroupLabel(Message element) {
-    final DateTime dateTime = element.time.toDate();
-    final DateTime now = DateTime.now();
-    final DateTime yesterday = DateTime.now().subtract(const Duration(days: 1));
+    if (element.status != 'uploading') {
+      final DateTime dateTime = element.time!.toDate().toLocal();
+      final formattedDate = DateFormat('dd/MM/yyyy').format(dateTime);
+      final now = DateFormat('dd/MM/yyyy').format(DateTime.now().toLocal());
+      final yesterday = DateFormat('dd/MM/yyyy').format(
+          DateTime.now().toLocal().subtract(const Duration(days: 1)).toLocal());
 
-    final DateTime messageDate =
-        DateTime(dateTime.year, dateTime.month, dateTime.day);
-    final DateTime currentDate = DateTime(now.year, now.month, now.day);
-    final DateTime yesterdayDate =
-        DateTime(yesterday.year, yesterday.month, yesterday.day);
+      // final DateTime messageDate =
+      //     DateTime(dateTime.year, dateTime.month, dateTime.day);
+      // final currentDate =
+      //     DateTime(now.year, now.month, now.day).toLocal().toString();
+      // final yesterdayDate =
+      //     DateTime(yesterday.year, yesterday.month, yesterday.day)
+      //         .toLocal()
+      //         .toString();
 
-    if (messageDate == currentDate) {
-      return 'Today';
-    } else if (messageDate == yesterdayDate) {
-      return 'Yesterday';
+      // if (formattedDate == now) {
+      //   return 'Today';
+      // } else if (formattedDate == yesterday) {
+      //   return 'Yesterday';
+      // } else {
+      return formattedDate;
+      // }
     } else {
-      return '${messageDate.day}/${messageDate.month}/${messageDate.year}';
+      return '';
     }
   }
 
@@ -213,7 +264,6 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         padding: const EdgeInsets.only(bottom: 100),
         child: GroupedListView(
           elements: messages,
-          groupComparator: (value1, value2) => value2.compareTo(value1),
           groupBy: (element) {
             return _getGroupLabel(element);
           },
@@ -221,22 +271,24 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           order: GroupedListOrder.DESC,
           reverse: true,
           useStickyGroupSeparators: messages.length > 6 ? true : false,
-          groupSeparatorBuilder: (value) => Padding(
-            padding: AppDimensions.paddingSymmetricV25H100,
-            child: Container(
-              decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(20)),
-              child: Text(
-                value,
-                textAlign: TextAlign.center,
-                style: AppStyles.font14Black400Weight,
-              ),
-            ),
-          ),
+          groupSeparatorBuilder: (value) => value != ''
+              ? Padding(
+                  padding: AppDimensions.paddingSymmetricV25H100,
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(20)),
+                    child: Text(
+                      value,
+                      textAlign: TextAlign.center,
+                      style: AppStyles.font14Black400Weight,
+                    ),
+                  ),
+                )
+              : const SizedBox(),
           separator: AppDimensions.verticalSpacing10,
           indexedItemBuilder: (context, element, index) => MessageItem(
-            chatCubit: chatCubit,
+            contact: widget.contact,
             message: messages[index],
             isSentByMe: messages[index].senderId == chatCubit.currentUser!.uid,
           ),

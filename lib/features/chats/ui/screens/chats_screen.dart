@@ -4,7 +4,7 @@ import '../../../../core/app_router/routes.dart';
 import '../../../../core/theming/colors.dart';
 import '../../../../core/helpers/dimensions.dart';
 import '../../../../core/theming/styles.dart';
-import '../../../login/logic/authentication_cubit/authentication_cubit.dart';
+import '../../../login/logic/cubit/authentication_cubit.dart';
 import '../widgets/chat_item_widget.dart';
 import '../widgets/story_container_widget.dart';
 import '../../../../core/widgets/textformfield_widget.dart';
