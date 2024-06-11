@@ -10,7 +10,7 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import '../../../core/app_router/routes.dart';
 import '../../../core/helpers/circular_progress_indicator.dart';
 import '../../../core/helpers/snackbar.dart';
-import '../logic/authentication_cubit/authentication_cubit.dart';
+import '../logic/cubit/authentication_cubit.dart';
 
 // ignore: must_be_immutable
 class OtpScreen extends StatelessWidget {
@@ -118,14 +118,19 @@ class OtpScreen extends StatelessWidget {
         } else if (state is LoginSuccessState) {
           Navigator.pop(context);
 
+          context.read<AuthenticationCubit>().requestContactsPermission();
+        } else if (state is LoginFailedState) {
+          Navigator.pop(context);
+          showErrorSnackBar(context, state.errorMsg);
+        } else if (state is ContactsPermissionDeniedState) {
+          context.read<AuthenticationCubit>().signOut();
+          showErrorSnackBar(context, state.errorMsg);
+        } else if (state is ContactsPermissionAcceptedState) {
           context
               .read<AuthenticationCubit>()
               .createNewUser(phoneNumber: phoneNumber.completeNumber);
           Navigator.pushNamedAndRemoveUntil(
               context, Routes.homeScreen, (route) => false);
-        } else if (state is LoginFailedState) {
-          Navigator.pop(context);
-          showErrorSnackBar(context, state.errorMsg);
         }
       },
       child: child,
