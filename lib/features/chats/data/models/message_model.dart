@@ -6,8 +6,9 @@ class Message {
   final String receiverId;
   final String text;
   final String type;
-  final Timestamp time;
+  final Timestamp? time;
   final String status;
+  final String? thumbnailVideoUrl;
   final bool isDeleted;
 
   Message(
@@ -16,8 +17,9 @@ class Message {
       required this.receiverId,
       required this.text,
       required this.type,
-      required this.time,
+      this.time,
       required this.status,
+      this.thumbnailVideoUrl,
       required this.isDeleted});
 
   factory Message.fromMap(Map<String, dynamic> data) {
@@ -27,9 +29,10 @@ class Message {
         receiverId: data['receiverId'],
         text: data['text'],
         type: data['type'],
-        time: data['time'],
+        time: data['time'] as Timestamp? ?? Timestamp.now(),
         status: data['status'],
-        isDeleted: data["isDeleted"]);
+        isDeleted: data["isDeleted"],
+        thumbnailVideoUrl: data["thumbnailVideoUrl"]);
   }
 
   Map<String, dynamic> toMap() {
@@ -39,7 +42,7 @@ class Message {
       "receiverId": receiverId,
       "text": text,
       "type": type,
-      "time": time,
+      "time": FieldValue.serverTimestamp(),
       "status": status,
       "isDeleted": isDeleted
     };
