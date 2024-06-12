@@ -4,7 +4,7 @@ import 'package:chatify/features/groups/ui/groups_screen.dart';
 
 import 'calls/calls_screen.dart';
 import 'chats/ui/screens/chats_screen.dart';
-import 'login/logic/authentication_cubit/authentication_cubit.dart';
+import 'login/logic/cubit/authentication_cubit.dart';
 import 'profile/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

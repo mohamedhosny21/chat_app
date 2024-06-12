@@ -10,7 +10,7 @@ import 'package:intl_phone_field/phone_number.dart';
 import '../../../core/app_router/routes.dart';
 import '../../../core/helpers/circular_progress_indicator.dart';
 import '../../../core/helpers/snackbar.dart';
-import '../logic/authentication_cubit/authentication_cubit.dart';
+import '../logic/cubit/authentication_cubit.dart';
 
 // ignore: must_be_immutable
 class LoginScreen extends StatelessWidget {
