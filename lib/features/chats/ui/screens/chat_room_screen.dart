@@ -37,13 +37,6 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     chatCubit.initializeChatData(widget.contact.id);
   }
 
-  // @override
-  // void dispose() {
-  //   chatCubit.closeListener();
-
-  //   super.dispose();
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -208,10 +201,9 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     return Row(
       children: [
         CircleAvatar(
-          backgroundImage: AssetImage(widget.contact.profilePicture ??
-              AppConstants
-                  .defaultUserPhoto), // Replace with your contact's photo URL
-          radius: 20.0.r, // Adjust as needed
+          backgroundImage: AssetImage(
+              widget.contact.profilePicture ?? AppConstants.defaultUserPhoto),
+          radius: 20.0.r,
         ),
         AppDimensions.horizontalSpacing8,
         Expanded(
@@ -227,66 +219,42 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     );
   }
 
-  String _getGroupLabel(Message element) {
-    if (element.status != 'uploading') {
-      final DateTime dateTime = element.time!.toDate().toLocal();
-      final formattedDate = DateFormat('dd/MM/yyyy').format(dateTime);
-      final now = DateFormat('dd/MM/yyyy').format(DateTime.now().toLocal());
-      final yesterday = DateFormat('dd/MM/yyyy').format(
-          DateTime.now().toLocal().subtract(const Duration(days: 1)).toLocal());
+  String _showGroupLabel(Message message) {
+    if (message.status != 'uploading') {
+      final DateTime dateTime = message.time!.toDate().toLocal();
+      final DateTime now = DateTime.now().toLocal();
+      final DateTime startOfToday = DateTime(now.year, now.month, now.day);
+      final DateTime startOfYesterday =
+          startOfToday.subtract(const Duration(days: 1));
 
-      // final DateTime messageDate =
-      //     DateTime(dateTime.year, dateTime.month, dateTime.day);
-      // final currentDate =
-      //     DateTime(now.year, now.month, now.day).toLocal().toString();
-      // final yesterdayDate =
-      //     DateTime(yesterday.year, yesterday.month, yesterday.day)
-      //         .toLocal()
-      //         .toString();
-
-      // if (formattedDate == now) {
-      //   return 'Today';
-      // } else if (formattedDate == yesterday) {
-      //   return 'Yesterday';
-      // } else {
-      return formattedDate;
-      // }
+      if (dateTime.isAfter(startOfToday)) {
+        return 'Today';
+      } else if (dateTime.isAfter(startOfYesterday)) {
+        return 'Yesterday';
+      } else {
+        return DateFormat('dd/MM/yyyy').format(dateTime);
+      }
     } else {
       return '';
     }
   }
 
   Widget _buildMessageList(List<Message> messages) {
-    //TODO: check the order of dates with messages
-
     if (messages.isNotEmpty) {
       return Padding(
         padding: const EdgeInsets.only(bottom: 100),
-        child: GroupedListView(
+        child: GroupedListView<Message, String>(
           elements: messages,
-          groupBy: (element) {
-            return _getGroupLabel(element);
-          },
-          stickyHeaderBackgroundColor: Colors.white,
-          order: GroupedListOrder.DESC,
+          groupBy: (message) => _showGroupLabel(message),
+          //to ensure that "Today" and "Yesterday" appear at the top, followed by other dates in descending order.
+          groupComparator: (group1, group2) => _sortMessagesGroupLabels(group1,
+              group2), //the order of items within each group are ordered in descending order of their timestamps (newest first)
+          itemComparator: (item1, item2) => item2.time!.compareTo(item1.time!),
           reverse: true,
+          stickyHeaderBackgroundColor: Colors.white,
           useStickyGroupSeparators: messages.length > 6 ? true : false,
-          groupSeparatorBuilder: (value) => value != ''
-              ? Padding(
-                  padding: AppDimensions.paddingSymmetricV25H100,
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(20)),
-                    child: Text(
-                      value,
-                      textAlign: TextAlign.center,
-                      style: AppStyles.font14Black400Weight,
-                    ),
-                  ),
-                )
-              : const SizedBox(),
-          separator: AppDimensions.verticalSpacing10,
+          groupSeparatorBuilder: (messageDate) =>
+              _buildGroupHeaderLabel(messageDate),
           indexedItemBuilder: (context, element, index) => MessageItem(
             contact: widget.contact,
             message: messages[index],
@@ -301,5 +269,46 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         style: AppStyles.font20GreyBold,
       ),
     );
+  }
+
+  int _sortMessagesGroupLabels(String group1, String group2) {
+    //group1 represents the current group being compared, and group2 represents the next group.
+    // Ensure that "Today" and "Yesterday" appear at the top, followed by other dates in descending order.
+    if (group1 == 'Today') {
+      return -1; // today group should appear before the second group.
+    }
+    if (group1 == 'Yesterday') {
+      return 1; // yesterday group should appear after the second group.
+    }
+    if (group1.isEmpty || group2.isEmpty) {
+      return group2.isEmpty
+          ? -1
+          : 1; // empty groups should be placed at the bottom
+    }
+
+    final DateTime date1 = DateFormat('dd/MM/yyyy').parse(group1);
+    final DateTime date2 = DateFormat('dd/MM/yyyy').parse(group2);
+
+    return date2.compareTo(
+        date1); // For other dates, use normal date comparison to order them in descending order
+  }
+
+  Widget _buildGroupHeaderLabel(String messageDate) {
+    if (messageDate.isNotEmpty) {
+      return Padding(
+        padding: AppDimensions.paddingSymmetricV25H100,
+        child: Container(
+          decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(20.r)),
+          child: Text(
+            messageDate,
+            textAlign: TextAlign.center,
+            style: AppStyles.font14Black400Weight,
+          ),
+        ),
+      );
+    }
+    return const SizedBox();
   }
 }
