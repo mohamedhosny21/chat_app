@@ -22,24 +22,20 @@ class ChatroomDocumentMessage extends StatelessWidget {
       onTap: () {
         context.read<ChatCubit>().viewDocumentFile(message.text);
       },
-      child: Column(
-        children: [
-          ListTile(
-            leading: Icon(
-              Icons.insert_drive_file,
-              color: isSentByMe ? Colors.white : AppColors.mainBlack,
-              size: 40.w,
-            ),
-            title: Text(
-              documentName,
-              style: isSentByMe
-                  ? AppStyles.font15White500Weight
-                      .copyWith(fontWeight: FontWeight.bold)
-                  : AppStyles.font15Black500Weight
-                      .copyWith(fontWeight: FontWeight.bold),
-            ),
-          )
-        ],
+      child: ListTile(
+        leading: Icon(
+          Icons.insert_drive_file,
+          color: isSentByMe ? Colors.white : AppColors.mainBlack,
+          size: 40.w,
+        ),
+        title: Text(
+          documentName,
+          style: isSentByMe
+              ? AppStyles.font15White500Weight
+                  .copyWith(fontWeight: FontWeight.bold)
+              : AppStyles.font15Black500Weight
+                  .copyWith(fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }
