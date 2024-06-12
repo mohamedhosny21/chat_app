@@ -38,6 +38,7 @@ class ChatComponents extends StatelessWidget {
                 const Spacer(),
                 AppDimensions.horizontalSpacing8,
                 MessageTimeWidget(
+                    isInChatroom: false,
                     messageTime: onGoingChat.lastMessageTime!,
                     messageStyle: AppStyles.font10GreySemiBold),
               ],
