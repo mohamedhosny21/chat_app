@@ -11,7 +11,7 @@ class OnGoingChat {
   final String lastMessageId;
   final String lastMessage;
   final String lastMessageSenderId;
-  final Timestamp lastMessageTime;
+  final Timestamp? lastMessageTime;
   final String? lastMessageStatus;
   final String lastMessageType;
   final bool isLastMessageDeleted;
@@ -25,7 +25,7 @@ class OnGoingChat {
       required this.lastMessage,
       required this.lastMessageSenderId,
       required this.lastMessageId,
-      required this.lastMessageTime,
+      this.lastMessageTime,
       this.lastMessageStatus = 'sent',
       required this.lastMessageType,
       required this.isLastMessageDeleted,
@@ -55,7 +55,7 @@ class OnGoingChat {
         phoneNumber: data['phoneNumber'],
         lastMessageId: data['lastMessageId'],
         lastMessage: data['lastMessage'],
-        lastMessageTime: data['lastMessageTime'],
+        lastMessageTime: data['lastMessageTime'] as Timestamp,
         lastMessageStatus: data['lastMessageStatus'],
         lastMessageType: data['lastMessageType'],
         isLastMessageDeleted: data['isLastMessageDeleted'],
