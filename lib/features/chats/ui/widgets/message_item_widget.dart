@@ -1,11 +1,11 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:animated_text_kit/animated_text_kit.dart';
 
 import 'package:chatify/features/chats/ui/widgets/chatroom_document_message.dart';
 import 'package:chatify/features/chats/ui/widgets/chatroom_image_message.dart';
 import 'package:chatify/features/chats/ui/widgets/chatroom_video_message.dart';
 import 'package:chatify/features/chats/ui/widgets/deleted_message_widget.dart';
 import 'package:chatify/features/chats/ui/widgets/message_time_widget.dart';
+import 'package:chatify/features/chats/ui/widgets/uploading_message_widget.dart';
 import 'package:chatify/features/contacts/data/contact_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -80,34 +80,29 @@ class MessageItem extends StatelessWidget {
   }
 
   Widget _buildMessageInfo() {
-    return PopupMenuButton(
-      icon: const Icon(Icons.more_horiz_rounded),
-      iconSize: 20.w,
-      color: Colors.white,
-      itemBuilder: (context) => [
-        PopupMenuItem(
-            onTap: () {
-              if (isSentByMe) {
-                if (message.status != 'uploading') {
-                  context
-                      .read<ChatCubit>()
-                      .updateDeletedMessages(message, message.receiverId);
-                } else {
-                  context
-                      .read<ChatCubit>()
-                      .deleteMessagePermanently(message.id);
-                }
-              }
-            },
-            height: 30.h,
-            child: Center(
-                child: Text(
-              'Delete',
-              style: AppStyles.font14Black400Weight
-                  .copyWith(fontWeight: FontWeight.bold),
-            )))
-      ],
-    );
+    if (isSentByMe && message.status != 'uploading') {
+      return PopupMenuButton(
+        icon: const Icon(Icons.more_horiz_rounded),
+        iconSize: 20.w,
+        color: Colors.white,
+        itemBuilder: (context) => [
+          PopupMenuItem(
+              onTap: () {
+                context
+                    .read<ChatCubit>()
+                    .updateDeletedMessages(message, message.receiverId);
+              },
+              height: 30.h,
+              child: Center(
+                  child: Text(
+                'Delete',
+                style: AppStyles.font14Black400Weight
+                    .copyWith(fontWeight: FontWeight.bold),
+              )))
+        ],
+      );
+    }
+    return const SizedBox();
   }
 
   Widget _buildChatContainerWithMessageTime() {
@@ -123,6 +118,7 @@ class MessageItem extends StatelessWidget {
           _buildChatContainer(),
 
           MessageTimeWidget(
+              isInChatroom: true,
               messageTime: message.time!,
               messageStyle: AppStyles.font12DarkGrey500Weight),
           // ),
@@ -133,15 +129,18 @@ class MessageItem extends StatelessWidget {
 
   Widget _buildMessageStatusIcon() {
     if (isSentByMe && !message.isDeleted) {
-      if (message.status == 'sent') {
-        return _positionedMessageStatusIcon(Icons.done, AppColors.lightPink);
+      if (message.status == 'uploading') {
+        return _positionedMessageStatusIcon(
+            Icons.watch_later_outlined, Colors.white);
+      } else if (message.status == 'sent') {
+        return _positionedMessageStatusIcon(Icons.done, Colors.white);
       } else if (message.status == 'delivered') {
         return _positionedMessageStatusIcon(
             Icons.done_all, AppColors.lightPink);
       } else if (message.status == 'seen') {
         return _positionedMessageStatusIcon(Icons.done_all, Colors.white);
       } else {
-        _positionedMessageStatusIcon(Icons.watch_later_outlined, Colors.white);
+        const SizedBox();
       }
     }
     return const SizedBox();
@@ -159,33 +158,16 @@ class MessageItem extends StatelessWidget {
     );
   }
 
-  Widget _buildUploadingMessage() {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          textAlign: TextAlign.center,
-          'UPLOADING',
-          style: AppStyles.font18Black600Weight.copyWith(
-            letterSpacing: 1.2,
-          ),
-        ),
-        SizedBox(
-          width: 10.w,
-        ),
-        AnimatedTextKit(
-          animatedTexts: [
-            WavyAnimatedText('....', textStyle: AppStyles.font25BlackBold),
-          ],
-          repeatForever: true,
-        )
-      ],
-    );
-  }
-
   Widget _buildFileMessage() {
     if (message.status == 'uploading') {
-      return _buildUploadingMessage();
+      return Stack(
+        children: [
+          UploadingMessageWidget(
+            message: message,
+          ),
+          _buildMessageStatusIcon()
+        ],
+      );
     } else {
       return Stack(
         children: [
