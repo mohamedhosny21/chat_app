@@ -134,7 +134,6 @@ class ChatCubit extends Cubit<ChatState> {
 
   @override
   Future<void> close() async {
-    _chatRepository.updateMessageSnapshot?.cancel();
     _messageSubscription?.cancel();
     _onGoingMessageSubscription?.cancel();
     FlutterContacts.removeListener(
