@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:uuid/uuid.dart';
@@ -18,12 +19,10 @@ import '../models/message_model.dart';
 import '../models/ongoing_chat_model.dart';
 
 class ChatRepository {
-  final _firestoreDatabase = FirebaseFirestore.instance;
-  final _cloudStorageDatabase = FirebaseStorage.instance;
+  final _firestore = FirebaseFirestore.instance;
+  final _storage = FirebaseStorage.instance;
   final Uuid _uuid = const Uuid();
   String chatId = '';
-  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
-      updateMessageSnapshot;
 
   Future<void> getChatId(String receiverId) async {
     final currentUser = FirebaseAuth.instance.currentUser;
@@ -40,7 +39,6 @@ class ChatRepository {
   Future<Message> sendMessage(
       {required ContactModel contact,
       required String messageText,
-      String? thumbnailVideoUrl,
       required String messageType,
       required String status}) async {
     final currentUser = FirebaseAuth.instance.currentUser;
@@ -50,13 +48,12 @@ class ChatRepository {
       senderId: currentUser!.uid,
       receiverId: contact.id,
       text: messageText,
-      thumbnailVideoUrl: thumbnailVideoUrl,
       type: messageType,
       status: status,
       isDeleted: false,
     );
 
-    final addedDocument = await _firestoreDatabase
+    final addedDocument = await _firestore
         .collection("Chat_Rooms")
         .doc(chatId)
         .collection("Messages")
@@ -80,7 +77,7 @@ class ChatRepository {
     final currentUser = FirebaseAuth.instance.currentUser;
 
     _updateMessagesData(messageId: message.id, updates: {'isDeleted': true});
-    final querySnapshot = await _firestoreDatabase
+    final querySnapshot = await _firestore
         .collection("Chat_Rooms")
         .doc(chatId)
         .collection("Messages")
@@ -104,7 +101,7 @@ class ChatRepository {
   }
 
   Future<void> deleteMessagePermanently(String messageId) async {
-    final messageSnapshot = await _firestoreDatabase
+    final messageSnapshot = await _firestore
         .collection('Chat_Rooms')
         .doc(chatId)
         .collection('Messages')
@@ -113,7 +110,7 @@ class ChatRepository {
         .get();
 
     if (messageSnapshot.docs.first.exists) {
-      await _firestoreDatabase
+      await _firestore
           .collection('Chat_Rooms')
           .doc(chatId)
           .collection('Messages')
@@ -127,7 +124,7 @@ class ChatRepository {
       required String userId,
       required Map<String, dynamic> updates}) async {
     try {
-      final querySnapshot = await _firestoreDatabase
+      final querySnapshot = await _firestore
           .collection("OngoingChats")
           .doc(userId)
           .collection("Conversations")
@@ -135,7 +132,7 @@ class ChatRepository {
           .limit(1)
           .get();
       if (querySnapshot.docs.isNotEmpty) {
-        _firestoreDatabase
+        _firestore
             .collection("OngoingChats")
             .doc(userId)
             .collection("Conversations")
@@ -152,7 +149,7 @@ class ChatRepository {
     required Map<String, dynamic> updates,
   }) async {
     try {
-      final querySnapshot = await _firestoreDatabase
+      final querySnapshot = await _firestore
           .collection("Chat_Rooms")
           .doc(chatId)
           .collection("Messages")
@@ -161,7 +158,7 @@ class ChatRepository {
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        await _firestoreDatabase
+        await _firestore
             .collection("Chat_Rooms")
             .doc(chatId)
             .collection("Messages")
@@ -191,7 +188,7 @@ class ChatRepository {
   }
 
   Future<int> _getUnreadMessagesCount(String receiverId) async {
-    final unreadMessagesSubscription = await _firestoreDatabase
+    final unreadMessagesSubscription = await _firestore
         .collection("Chat_Rooms")
         .doc(chatId)
         .collection("Messages")
@@ -202,36 +199,12 @@ class ChatRepository {
     final int unreadMessagesCount = unreadMessagesSubscription.size;
 
     return unreadMessagesCount;
-    /** Future<int> _getUnreadMessagesCount(String receiverId) async {
-    //Completer : handle asynchronous operations. It provides a way to produce values that will be available in the future.
-    final Completer<int> completer = Completer<int>();
-
-    final StreamSubscription<QuerySnapshot> unreadMessagesSubscription =
-        _firestoreDatabase
-            .collection("Chat_Rooms")
-            .doc(chatId)
-            .collection("Messages")
-            .where('receiverId', isEqualTo: receiverId)
-            .where('status', isNotEqualTo: 'seen')
-            .snapshots()
-            .listen((unreadMessagesCountSnapshots) {
-      final int unreadMessagesCount = unreadMessagesCountSnapshots.size;
-      //When unreadMessagesCount has the value , we complete the Completer with that count. This makes the count available as the future's value.
-      completer.complete(unreadMessagesCount);
-    });
-    //we pause the execution of _addReceiverChatModelToDatabase until the future is completed.
-    final int unreadMessagesCount = await completer.future;
-    await unreadMessagesSubscription.cancel();
-
-    return unreadMessagesCount;
-  }
- */
   }
 
   Future<void> resetUnreadMessagesCount() async {
     final currentUser = FirebaseAuth.instance.currentUser;
 
-    await _firestoreDatabase
+    await _firestore
         .collection("OngoingChats")
         .doc(currentUser!.uid)
         .collection("Conversations")
@@ -252,7 +225,7 @@ class ChatRepository {
       mostRecentMessage: mostRecentMessage,
     );
 
-    await _firestoreDatabase
+    await _firestore
         .collection("OngoingChats")
         .doc(
           currentUser!.uid,
@@ -276,7 +249,7 @@ class ChatRepository {
         mostRecentMessage: mostRecentMessage,
         unreadMessagesCount: unreadMessagesCount);
 
-    await _firestoreDatabase
+    await _firestore
         .collection("OngoingChats")
         .doc(contact.id)
         .collection("Conversations")
@@ -302,7 +275,8 @@ class ChatRepository {
         .pickFiles(allowMultiple: true, type: FileType.image);
     if (image != null) {
       for (var file in image.files) {
-        final File imageFile = File(file.path!);
+        final File imageFile = await _saveFilePermanently(file);
+
         _sendFileMessage(
             fileName: file.name,
             file: imageFile,
@@ -318,14 +292,12 @@ class ChatRepository {
         .pickFiles(allowMultiple: true, type: FileType.video);
     if (video != null) {
       for (var file in video.files) {
-        final videoFile = File(file.path!);
-        final compressedVideoFile = await _compressVideo(videoFile);
-        final thumbnailVideo =
-            await _getThumbnailVideo(compressedVideoFile.file!, contact);
+        final videoFile = await _saveFilePermanently(file);
+        final thumbnailVideo = await _getThumbnailVideo(videoFile, contact);
         _sendFileMessage(
             fileName: file.name,
             thumbnailVideo: thumbnailVideo,
-            file: compressedVideoFile.file!,
+            file: videoFile,
             cloudDirectoryPath: 'Videos',
             messageType: 'video',
             contact: contact);
@@ -340,7 +312,7 @@ class ChatRepository {
         allowedExtensions: ['pdf', 'doc', 'docx', 'txt']);
     if (document != null) {
       for (var file in document.files) {
-        final documentFile = File(file.path!);
+        final documentFile = await _saveFilePermanently(file);
         _sendFileMessage(
             fileName: file.name,
             file: documentFile,
@@ -362,6 +334,12 @@ class ChatRepository {
     return fileName;
   }
 
+  Future<File> _saveFilePermanently(PlatformFile file) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final newFile = File('${directory.path}/${file.name}');
+    return File(file.path!).copy(newFile.path);
+  }
+
   void _sendFileMessage(
       {required File file,
       required String cloudDirectoryPath,
@@ -370,25 +348,31 @@ class ChatRepository {
       required String messageType,
       required ContactModel contact}) async {
     final newMessage = await sendMessage(
-        contact: contact,
-        thumbnailVideoUrl: thumbnailVideo?.path,
-        messageText: 'Uploading....',
-        messageType: messageType,
-        status: 'uploading');
-    String? fileUrl = await _uploadFileAndGetUrl(
-      fileName: fileName,
-      file: file,
-      cloudDirectoryPath: cloudDirectoryPath,
+      contact: contact,
+      messageText: messageType != 'video' ? file.path : thumbnailVideo!.path,
+      messageType: messageType,
+      status: 'uploading',
     );
+    MediaInfo? compressedVideoFile;
+    if (messageType == 'video') {
+      compressedVideoFile = await _compressVideo(file);
+    }
     String? thumbnailVideoUrl = await _uploadFileAndGetUrl(
       fileName: fileName,
       file: thumbnailVideo,
       cloudDirectoryPath: 'Thumbnails',
     );
+    String? fileUrl = await _uploadFileAndGetUrl(
+      fileName: fileName,
+      file: messageType == 'video' ? compressedVideoFile!.file : file,
+      cloudDirectoryPath: cloudDirectoryPath,
+    );
+
     await _updateMessagesData(messageId: newMessage.id, updates: {
       'text': fileUrl,
       'status': 'sent',
-      'thumbnailVideoUrl': thumbnailVideoUrl
+      'thumbnailVideoUrl':
+          thumbnailVideoUrl //this field was not created when sending message but update will create it
     });
     await _updateChatModelWithNewMessage(newMessage.id, contact);
   }
@@ -400,7 +384,7 @@ class ChatRepository {
     if (file != null) {
       final String filePath = '${_uuid.v1()}/$fileName';
       final reference =
-          _cloudStorageDatabase.ref().child(cloudDirectoryPath).child(filePath);
+          _storage.ref().child(cloudDirectoryPath).child(filePath);
       debugPrint('file name :$filePath');
       final uploadTask = await _uploadFileToCloudStorage(reference, file);
       final fileUrl = await _getDownloadedCloudFileUrl(uploadTask);
@@ -412,7 +396,7 @@ class ChatRepository {
 
   Future<void> _updateChatModelWithNewMessage(
       String messageId, ContactModel contact) async {
-    final querySnapshot = await _firestoreDatabase
+    final querySnapshot = await _firestore
         .collection('Chat_Rooms')
         .doc(chatId)
         .collection('Messages')
@@ -437,7 +421,7 @@ class ChatRepository {
 
   Future<void> _deleteFileFromCloudStorage(String fileUrl) async {
     try {
-      final ref = _cloudStorageDatabase.refFromURL(fileUrl);
+      final ref = _storage.refFromURL(fileUrl);
       await ref.delete();
       debugPrint('deleted file url :$fileUrl');
     } catch (error) {
@@ -451,11 +435,11 @@ class ChatRepository {
     return compressedVideo!;
   }
 
-  Future<File> _getThumbnailVideo(File videoPath, ContactModel contact) async {
-    debugPrint('video path :$videoPath');
+  Future<File> _getThumbnailVideo(File videoFile, ContactModel contact) async {
+    debugPrint('video path :${videoFile.path}');
 
     final thumbnailPath = await VideoCompress.getFileThumbnail(
-      videoPath.path,
+      videoFile.path,
       quality: 50,
     );
     debugPrint('thumb path :$thumbnailPath');
