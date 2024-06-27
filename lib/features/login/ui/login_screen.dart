@@ -78,7 +78,6 @@ class LoginScreen extends StatelessWidget {
               borderSide: BorderSide(color: AppColors.mainBlack))),
       initialCountryCode: 'EG',
       autofocus: true,
-      keyboardType: TextInputType.phone,
       onSaved: (value) {
         phoneNumber = value!;
       },
