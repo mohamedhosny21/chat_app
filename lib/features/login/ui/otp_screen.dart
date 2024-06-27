@@ -1,3 +1,7 @@
+//
+
+import 'package:chatify/core/permissions_handler/permissions_handler_cubit.dart';
+
 import '../../../core/theming/colors.dart';
 import '../../../core/helpers/dimensions.dart';
 import '../../../core/theming/styles.dart';
@@ -110,29 +114,47 @@ class OtpScreen extends StatelessWidget {
     );
   }
 
-  BlocListener _buildOtpBlocListener({required Widget child}) {
-    return BlocListener<AuthenticationCubit, AuthenticationState>(
-      listener: (context, state) {
-        if (state is LoginLoadingState) {
-          showCircularProgressIndicator(context);
-        } else if (state is LoginSuccessState) {
-          Navigator.pop(context);
+  MultiBlocListener _buildOtpBlocListener({required Widget child}) {
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<AuthenticationCubit, AuthenticationState>(
+          listener: (context, state) {
+            if (state is LoginLoadingState) {
+              showCircularProgressIndicator(context);
+            } else if (state is LoginSuccessState) {
+              Navigator.pop(context);
 
-          context.read<AuthenticationCubit>().requestContactsPermission();
-        } else if (state is LoginFailedState) {
-          Navigator.pop(context);
-          showErrorSnackBar(context, state.errorMsg);
-        } else if (state is ContactsPermissionDeniedState) {
-          context.read<AuthenticationCubit>().signOut();
-          showErrorSnackBar(context, state.errorMsg);
-        } else if (state is ContactsPermissionAcceptedState) {
-          context
-              .read<AuthenticationCubit>()
-              .createNewUser(phoneNumber: phoneNumber.completeNumber);
-          Navigator.pushNamedAndRemoveUntil(
-              context, Routes.homeScreen, (route) => false);
-        }
-      },
+              context
+                  .read<PermissionsHandlerCubit>()
+                  .requestContactsPermission();
+            } else if (state is LoginFailedState) {
+              Navigator.pop(context);
+              showErrorSnackBar(context, state.errorMsg);
+            }
+          },
+        ),
+        BlocListener<PermissionsHandlerCubit, PermissionsHandlerState>(
+          listener: (context, state) {
+            if (state is ContactsPermissionDeniedState) {
+              context.read<AuthenticationCubit>().signOut();
+              showErrorSnackBar(context, state.errorMsg);
+            } else if (state is ContactsPermissionAcceptedState) {
+              context
+                  .read<PermissionsHandlerCubit>()
+                  .requestNotificationsPermission();
+            } else if (state is NotificationPermissionDeniedState) {
+              context.read<AuthenticationCubit>().signOut();
+              showErrorSnackBar(context, state.errorMsg);
+            } else if (state is NotificationPermissionAcceptedState) {
+              context
+                  .read<AuthenticationCubit>()
+                  .createNewUser(phoneNumber: phoneNumber.completeNumber);
+              Navigator.pushNamedAndRemoveUntil(
+                  context, Routes.homeScreen, (route) => false);
+            }
+          },
+        ),
+      ],
       child: child,
     );
   }
