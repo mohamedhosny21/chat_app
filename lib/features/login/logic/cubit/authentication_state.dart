@@ -29,11 +29,3 @@ class AuthenticationUserState extends AuthenticationState {}
 class UnAuthenticationUserState extends AuthenticationState {}
 
 class UserCreationState extends AuthenticationState {}
-
-class ContactsPermissionAcceptedState extends AuthenticationState {}
-
-class ContactsPermissionDeniedState extends AuthenticationState {
-  final String errorMsg;
-
-  ContactsPermissionDeniedState({required this.errorMsg});
-}

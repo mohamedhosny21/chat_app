@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/app_router/routes.dart';
-import '../../../../core/helpers/constants.dart';
+import '../../../../core/helpers/constants/app_constants.dart';
 import '../../../../core/theming/colors.dart';
 import '../../../contacts/data/contact_model.dart';
 import '../../data/models/message_model.dart';
@@ -35,6 +35,7 @@ class ChatroomVideoMessage extends StatelessWidget {
                 ? AppConstants.senderLoadingGif
                 : AppConstants.receiverLoadingGif,
             image: message.thumbnailVideoUrl ?? message.text,
+            fit: BoxFit.cover,
           ),
           _buildPlayVideoIcon(),
         ],

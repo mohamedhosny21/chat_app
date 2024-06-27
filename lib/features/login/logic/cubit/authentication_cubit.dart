@@ -1,11 +1,12 @@
+import 'package:chatify/core/dependency_injection/dependency_injection.dart';
+import 'package:chatify/core/notifications_manager/data/notifications_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
 
 import '../../../../core/app_router/routes.dart';
-import '../../../../core/helpers/constants.dart';
+import '../../../../core/helpers/constants/app_constants.dart';
 
 part 'authentication_state.dart';
 
@@ -79,9 +80,13 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   }
 
   void createNewUser({required String phoneNumber}) async {
+    final deviceToken =
+        await getIt<NotificationsRepository>().getCurrentDeviceToken();
     final newUser = <String, dynamic>{
       "phone_number": phoneNumber,
-      "photo": AppConstants.defaultUserPhoto
+      "photo": AppConstants.defaultUserPhoto,
+      "deviceToken": deviceToken,
+      "tokenCreatedAt": FieldValue.serverTimestamp()
     };
     FirebaseAuth.instance.authStateChanges().listen((currentUser) async {
       debugPrint(currentUser?.uid);
@@ -115,16 +120,5 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       }
     }
     return initialRoute;
-  }
-
-  Future<bool> requestContactsPermission() async {
-    final requestPermission = await FlutterContacts.requestPermission();
-    if (requestPermission) {
-      emit(ContactsPermissionAcceptedState());
-      return requestPermission;
-    } else {
-      emit(ContactsPermissionDeniedState(errorMsg: 'Permission Denied !'));
-      throw Exception('Permission Denied !');
-    }
   }
 }
