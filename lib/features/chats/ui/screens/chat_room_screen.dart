@@ -1,4 +1,4 @@
-import 'package:chatify/core/helpers/constants.dart';
+import 'package:chatify/core/helpers/constants/app_constants.dart';
 import 'package:chatify/core/theming/colors.dart';
 import 'package:chatify/core/helpers/dimensions.dart';
 import 'package:chatify/core/theming/styles.dart';
@@ -272,14 +272,10 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   }
 
   int _sortMessagesGroupLabels(String group1, String group2) {
-    //group1 represents the current group being compared, and group2 represents the next group.
-    // Ensure that "Today" and "Yesterday" appear at the top, followed by other dates in descending order.
-    if (group1 == 'Today') {
-      return -1; // today group should appear before the second group.
-    }
-    if (group1 == 'Yesterday') {
-      return 1; // yesterday group should appear after the second group.
-    }
+    if (group1 == 'Today') return -1;
+    if (group2 == 'Today') return 1;
+    if (group1 == 'Yesterday') return -1;
+    if (group2 == 'Yesterday') return 1;
     if (group1.isEmpty || group2.isEmpty) {
       return group2.isEmpty
           ? -1
@@ -289,8 +285,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     final DateTime date1 = DateFormat('dd/MM/yyyy').parse(group1);
     final DateTime date2 = DateFormat('dd/MM/yyyy').parse(group2);
 
-    return date2.compareTo(
-        date1); // For other dates, use normal date comparison to order them in descending order
+    return date2.compareTo(date1);
   }
 
   Widget _buildGroupHeaderLabel(String messageDate) {
