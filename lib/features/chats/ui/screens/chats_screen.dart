@@ -29,12 +29,6 @@ class _ChatsScreenState extends State<ChatsScreen> {
     chatCubit.listenToContacts();
   }
 
-  // @override
-  // void dispose() {
-  //   context.read<ChatCubit>().closeListener();
-  //   super.dispose();
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
