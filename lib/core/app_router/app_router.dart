@@ -1,4 +1,5 @@
 import 'package:chatify/core/dependency_injection/dependency_injection.dart';
+import 'package:chatify/core/permissions_handler/permissions_handler_cubit.dart';
 import 'package:chatify/features/chats/ui/screens/video_message_screen.dart';
 import 'package:chatify/features/contacts/data/contact_model.dart';
 import 'package:chatify/features/contacts/logic/cubit/contacts_cubit.dart';
@@ -32,8 +33,15 @@ class AppRouter {
       case Routes.otpScreen:
         final argumentsData = settings.arguments as Map<String, dynamic>;
         return MaterialPageRoute(
-          builder: (context) => BlocProvider<AuthenticationCubit>.value(
-            value: getIt<AuthenticationCubit>(),
+          builder: (context) => MultiBlocProvider(
+            providers: [
+              BlocProvider<AuthenticationCubit>.value(
+                value: getIt<AuthenticationCubit>(),
+              ),
+              BlocProvider<PermissionsHandlerCubit>(
+                create: (context) => PermissionsHandlerCubit(),
+              ),
+            ],
             child: OtpScreen(
                 phoneNumber: argumentsData['phone_number'],
                 verificationId: argumentsData['verification_ID']),
