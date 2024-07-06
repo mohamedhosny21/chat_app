@@ -1,3 +1,4 @@
+import 'package:chatify/core/helpers/utils_functions.dart';
 import 'package:chatify/features/chats/data/models/message_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,8 +17,7 @@ class ChatroomDocumentMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String documentName =
-        context.read<ChatCubit>().extractFileNameFromUrl(message.text);
+    final String documentName = FileUtils.extractFileName(message.text);
     return GestureDetector(
       onTap: () {
         context.read<ChatCubit>().viewDocumentFile(message.text);

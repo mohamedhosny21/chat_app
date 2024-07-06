@@ -1,11 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 
 import '../contact_model.dart';
 
 class ContactRepository {
-  final firestoreDatabase = FirebaseFirestore.instance;
   List<ContactModel> filteredContacts = [];
 
   final String? loggedPhoneNumber =

@@ -15,7 +15,7 @@ part 'contacts_state.dart';
 
 class ContactsCubit extends Cubit<ContactsState> {
   final ContactRepository _contactRepository;
-  final firestoreDatabase = FirebaseFirestore.instance;
+  final _firestore = FirebaseFirestore.instance;
 
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
       _contactsSubscription;
@@ -72,7 +72,7 @@ class ContactsCubit extends Cubit<ContactsState> {
     required List<String> chunk,
     required List<Contact> deviceContacts,
   }) async {
-    _contactsSubscription = firestoreDatabase
+    _contactsSubscription = _firestore
         .collection("Users")
         .where("phone_number", whereIn: chunk)
         .snapshots()

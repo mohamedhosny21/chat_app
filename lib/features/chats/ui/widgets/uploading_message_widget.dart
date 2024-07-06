@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:chatify/core/helpers/utils_functions.dart';
 import 'package:chatify/core/theming/styles.dart';
 import 'package:chatify/features/chats/data/models/message_model.dart';
 import 'package:flutter/material.dart';
@@ -38,8 +39,7 @@ class UploadingMessageWidget extends StatelessWidget {
         ],
       );
     } else {
-      final String documentName =
-          context.read<ChatCubit>().extractFileNameFromUrl(message.text);
+      final String documentName = FileUtils.extractFileName(message.text);
       return ListTile(
         leading: Stack(
           alignment: Alignment.center,

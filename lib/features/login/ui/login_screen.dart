@@ -73,8 +73,9 @@ class LoginScreen extends StatelessWidget {
       },
       style: AppStyles.font14Black400Weight
           .copyWith(letterSpacing: 3, fontWeight: FontWeight.bold),
-      decoration: const InputDecoration(
-          focusedBorder: UnderlineInputBorder(
+      decoration: InputDecoration(
+          contentPadding: AppDimensions.paddingTop13,
+          focusedBorder: const UnderlineInputBorder(
               borderSide: BorderSide(color: AppColors.mainBlack))),
       initialCountryCode: 'EG',
       autofocus: true,

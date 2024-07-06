@@ -28,13 +28,6 @@ class _ContactsScreenState extends State<ContactsScreen> {
   }
 
   @override
-  // void dispose() {
-  //   _contactsCubit.closeListeners();
-
-  //   super.dispose();
-  // }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
