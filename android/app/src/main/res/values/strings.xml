@@ -1,0 +1,4 @@
+<resources>
+    <string name="Notification_Priority">Your Channel Name</string>
+    <string name="change_notification_priority">Your Channel Description</string>
+</resources>
