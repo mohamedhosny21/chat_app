@@ -21,6 +21,7 @@ class AppRouter {
     switch (settings.name) {
       case Routes.loginScreen:
         return MaterialPageRoute(
+          settings: settings,
           builder: (context) => BlocProvider<AuthenticationCubit>(
             create: (context) => getIt<AuthenticationCubit>(),
             child: LoginScreen(),
@@ -28,11 +29,13 @@ class AppRouter {
         );
       case Routes.homeScreen:
         return MaterialPageRoute(
+          settings: settings,
           builder: (context) => const NavBarPages(),
         );
       case Routes.otpScreen:
         final argumentsData = settings.arguments as Map<String, dynamic>;
         return MaterialPageRoute(
+          settings: settings,
           builder: (context) => MultiBlocProvider(
             providers: [
               BlocProvider<AuthenticationCubit>.value(
@@ -49,6 +52,7 @@ class AppRouter {
         );
       case Routes.contactsScreen:
         return MaterialPageRoute(
+          settings: settings,
           builder: (context) => BlocProvider<ContactsCubit>(
             create: (context) => getIt<ContactsCubit>(),
             child: const ContactsScreen(),
@@ -57,6 +61,7 @@ class AppRouter {
       case Routes.chatRoomScreen:
         final contact = settings.arguments as ContactModel;
         return MaterialPageRoute(
+          settings: settings,
           builder: (context) => BlocProvider<ChatCubit>.value(
               value: getIt<ChatCubit>(),
               child: ChatRoomScreen(
@@ -66,6 +71,7 @@ class AppRouter {
       case Routes.videoMessageScreen:
         final argumentData = settings.arguments as Map<String, dynamic>;
         return MaterialPageRoute(
+          settings: settings,
           builder: (context) => VideoMessageScreen(
             isSentByMe: argumentData['isSentByMe'],
             videoMessage: argumentData['videoMessage'],
@@ -75,6 +81,7 @@ class AppRouter {
       case Routes.imageMessageScreen:
         final argumentData = settings.arguments as Map<String, dynamic>;
         return MaterialPageRoute(
+            settings: settings,
             builder: (context) => ImageMessageScreen(
                   contact: argumentData['contact'],
                   isSentByMe: argumentData['isSentByMe'],
