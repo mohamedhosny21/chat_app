@@ -6,12 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/app_router/routes.dart';
-import '../../../../core/helpers/constants/app_constants.dart';
 
 part 'authentication_state.dart';
 
 class AuthenticationCubit extends Cubit<AuthenticationState> {
-  final firestoreDatabase = FirebaseFirestore.instance;
+  final _firestore = FirebaseFirestore.instance;
 
   final GlobalKey<FormState> phoneAuthFormKey = GlobalKey<FormState>();
   final GlobalKey<FormState> pinFormKey = GlobalKey<FormState>();
@@ -26,40 +25,41 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
         timeout: const Duration(seconds: 15),
 
         //Automatic handling of the SMS code on Android devices
-        verificationCompleted: onVerificationCompleted,
+        verificationCompleted: _onVerificationCompleted,
         //Handle failure events such as invalid phone numbers or whether the SMS quota has been exceeded.
-        verificationFailed: onVerificationFailed,
+        verificationFailed: _onVerificationFailed,
 
         // Save the verification ID and show a UI to enter the code
         // Handle when a code has been sent to the device from Firebase, used to prompt users to enter the code.
-        codeSent: onCodeSent,
+        codeSent: _onCodeSent,
         //Handle a timeout of when automatic SMS code handling fails.
-        codeAutoRetrievalTimeout: onCodeAutoRetrievalTimeout);
+        codeAutoRetrievalTimeout: _onCodeAutoRetrievalTimeout);
   }
 
-  void onVerificationCompleted(PhoneAuthCredential credential) async {
+  void _onVerificationCompleted(PhoneAuthCredential credential) async {
     debugPrint('Auto Verification Completed');
 
-    await signIn(credential);
+    await _signIn(credential);
   }
 
-  void onVerificationFailed(FirebaseAuthException error) {
+  void _onVerificationFailed(FirebaseAuthException error) {
     debugPrint(error.toString());
     emit(LoginFailedState(errorMsg: 'The number isn\'t valid'));
   }
 
-  void onCodeSent(String verificationId, int? resendToken) async {
+  void _onCodeSent(String verificationId, int? resendToken) async {
     emit(PhoneNumberSubmittedState(verificationId: verificationId));
   }
 
-  void onCodeAutoRetrievalTimeout(String verificationId) {
+  void _onCodeAutoRetrievalTimeout(String verificationId) {
     debugPrint('codeAutoRetrievalTimeout !');
   }
 
-  Future<void> signIn(PhoneAuthCredential credential) async {
+  Future<void> _signIn(PhoneAuthCredential credential) async {
     try {
       await FirebaseAuth.instance.signInWithCredential(credential);
       emit(LoginSuccessState(successMsg: 'Verification Completed'));
+      await getIt<NotificationsRepository>().saveCurrentDeviceTokenToDatabase();
     } catch (error) {
       emit(LoginFailedState(errorMsg: 'Incorrect OTP code'));
       throw Exception(error);
@@ -67,6 +67,10 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   }
 
   Future<void> signOut() async {
+    final currentDeviceToken =
+        await getIt<NotificationsRepository>().getCurrentDeviceToken();
+    await getIt<NotificationsRepository>()
+        .deleteDeviceTokenFromDatabase(currentDeviceToken!);
     await FirebaseAuth.instance.signOut();
   }
 
@@ -76,33 +80,30 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     PhoneAuthCredential phoneAuthCredential = PhoneAuthProvider.credential(
         verificationId: verificationId, smsCode: smsCode);
     debugPrint('verificationId : $verificationId');
-    await signIn(phoneAuthCredential);
+    await _signIn(phoneAuthCredential);
   }
 
   void createNewUser({required String phoneNumber}) async {
-    final deviceToken =
-        await getIt<NotificationsRepository>().getCurrentDeviceToken();
-    final newUser = <String, dynamic>{
-      "phone_number": phoneNumber,
-      "photo": AppConstants.defaultUserPhoto,
-      "deviceToken": deviceToken,
-      "tokenCreatedAt": FieldValue.serverTimestamp()
-    };
-    FirebaseAuth.instance.authStateChanges().listen((currentUser) async {
+    final bool isUserExists = await _checkUserExists();
+    if (!isUserExists) {
+      final newUser = <String, dynamic>{
+        "phone_number": phoneNumber,
+        "photo": null,
+      };
+      final currentUser = FirebaseAuth.instance.currentUser;
       debugPrint(currentUser?.uid);
-      await firestoreDatabase
-          .collection("Users")
-          .doc(currentUser!.uid)
-          .set(newUser);
+      await _firestore.collection("Users").doc(currentUser!.uid).set(newUser);
+      await getIt<NotificationsRepository>().saveCurrentDeviceTokenToDatabase();
+
       emit(UserCreationState());
-    });
+    }
   }
 
-  Future<bool> checkUserExists() async {
+  Future<bool> _checkUserExists() async {
     final currentUser = FirebaseAuth.instance.currentUser;
 
     final existingUserQuery =
-        await firestoreDatabase.collection("Users").doc(currentUser?.uid).get();
+        await _firestore.collection("Users").doc(currentUser?.uid).get();
     return existingUserQuery.exists;
   }
 
@@ -112,11 +113,13 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     String initialRoute = Routes.loginScreen;
 
     if (currentUser != null) {
-      bool userExists = await checkUserExists();
+      bool userExists = await _checkUserExists();
       if (!userExists) {
         await FirebaseAuth.instance.signOut();
       } else {
         initialRoute = Routes.homeScreen;
+        await getIt<NotificationsRepository>()
+            .saveCurrentDeviceTokenToDatabase();
       }
     }
     return initialRoute;
