@@ -35,7 +35,7 @@ class ContactItem extends StatelessWidget {
     return CircleAvatar(
       radius: 30.r,
       child: contact.profilePicture != null
-          ? Image.asset(contact.profilePicture.toString())
+          ? Image.network(contact.profilePicture!)
           : Image.asset(AppConstants.defaultUserPhoto),
     );
   }

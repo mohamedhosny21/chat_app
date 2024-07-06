@@ -3,6 +3,7 @@ import 'package:chatify/features/chats/data/models/ongoing_chat_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../../core/helpers/constants/app_constants.dart';
 import '../../../../core/helpers/dimensions.dart';
 import '../../../../core/theming/colors.dart';
 import 'chat_component_widget.dart';
@@ -38,17 +39,18 @@ class ChatItem extends StatelessWidget {
     return Stack(
       children: [
         Container(
-          height: 56.h,
-          width: 56.5.w,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            image: DecorationImage(
+            height: 56.h,
+            width: 56.5.w,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              image: DecorationImage(
                 fit: BoxFit.cover,
-                image: AssetImage(
-                  onGoingChat.profilePicture,
-                )),
-          ),
-        ),
+                image: onGoingChat.profilePicture == null
+                    ? const AssetImage(AppConstants.defaultUserPhoto)
+                    : NetworkImage(onGoingChat.profilePicture!)
+                        as ImageProvider,
+              ),
+            )),
         Positioned(
           right: 3,
           child: Container(
