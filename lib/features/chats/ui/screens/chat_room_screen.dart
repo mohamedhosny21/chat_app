@@ -109,7 +109,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     );
   }
 
-  IconButton _buildAddButton() {
+  IconButton _buildAddFileButton() {
     return IconButton(
       onPressed: () => _showFileSourceActionSheet(),
       icon: const Icon(Icons.add),
@@ -127,21 +127,23 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         controller: messageController);
   }
 
-  IconButton _buildSendMessageButton() {
-    return IconButton(
-      onPressed: () {
-        if (messageController.text.isNotEmpty) {
-          chatCubit.sendMessage(
-              contact: widget.contact,
-              messageText: messageController.text,
-              messageType: 'text');
+  Widget _buildSendMessageButton() {
+    return Flexible(
+      child: IconButton(
+        onPressed: () {
+          if (messageController.text.isNotEmpty) {
+            chatCubit.sendMessage(
+                contact: widget.contact,
+                messageText: messageController.text,
+                messageType: 'text');
 
-          messageController.clear();
-        }
-      },
-      icon: const Icon(Icons.send),
-      iconSize: 24.w,
-      color: AppColors.darkPink,
+            messageController.clear();
+          }
+        },
+        icon: const Icon(Icons.send),
+        iconSize: 24.w,
+        color: AppColors.darkPink,
+      ),
     );
   }
 
@@ -165,7 +167,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         child: Center(
             child: Row(
           children: [
-            _buildAddButton(),
+            _buildAddFileButton(),
             _buildMessageTextFormField(),
             _buildSendMessageButton(),
           ],
@@ -201,8 +203,9 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     return Row(
       children: [
         CircleAvatar(
-          backgroundImage: AssetImage(
-              widget.contact.profilePicture ?? AppConstants.defaultUserPhoto),
+          backgroundImage: widget.contact.profilePicture == null
+              ? const AssetImage(AppConstants.defaultUserPhoto)
+              : NetworkImage(widget.contact.profilePicture!) as ImageProvider,
           radius: 20.0.r,
         ),
         AppDimensions.horizontalSpacing8,
