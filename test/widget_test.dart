@@ -8,6 +8,7 @@
 import 'package:chatify/chatify_app.dart';
 import 'package:chatify/core/app_router/app_router.dart';
 import 'package:chatify/core/app_router/routes.dart';
+import 'package:chatify/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -15,6 +16,7 @@ void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(ChatifyApp(
+      navigatorKey: navigatorKey,
       initialRoute: Routes.loginScreen,
       appRouter: AppRouter(),
     ));
