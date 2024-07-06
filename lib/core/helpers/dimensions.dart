@@ -9,6 +9,8 @@ class AppDimensions {
       EdgeInsetsDirectional.symmetric(horizontal: 12.w, vertical: 12.h);
   static EdgeInsetsGeometry paddingTop12 =
       EdgeInsetsDirectional.only(top: 12.h);
+  static EdgeInsetsGeometry paddingTop13 =
+      EdgeInsetsDirectional.only(top: 13.h);
   static EdgeInsetsGeometry paddingBottom10 =
       EdgeInsetsDirectional.only(top: 10.h);
   static EdgeInsetsGeometry paddingTop50 =
