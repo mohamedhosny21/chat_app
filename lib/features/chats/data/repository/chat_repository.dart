@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:chatify/core/dependency_injection/dependency_injection.dart';
+import 'package:chatify/core/notifications_manager/data/models/notification_payload_model.dart';
+import 'package:chatify/core/notifications_manager/data/notifications_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,7 +16,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 import 'package:video_compress/video_compress.dart';
 
-import '../../../../core/helpers/constants.dart';
 import '../../../contacts/data/contact_model.dart';
 import '../models/message_model.dart';
 import '../models/ongoing_chat_model.dart';
@@ -22,18 +24,20 @@ class ChatRepository {
   final _firestore = FirebaseFirestore.instance;
   final _storage = FirebaseStorage.instance;
   final Uuid _uuid = const Uuid();
-  String chatId = '';
+  String chatRoomId = '';
 
-  Future<void> getChatId(String receiverId) async {
+  Future<String> getChatRoomId(String receiverId) async {
     final currentUser = FirebaseAuth.instance.currentUser;
 
-    List<String> participentsId = [currentUser!.uid, receiverId];
-    //sort is essential so if the sender and receiverId are exchanged with each other then the chatid will be the same id without creating new chat id due to the exchange of their ids
-    participentsId.sort();
-    debugPrint('particepents : $participentsId');
+    List<String> participantsId = [currentUser!.uid, receiverId];
+    //sort is essential so if the sender and receiverId are exchanged with each other then the chatRoomId will be the same id without creating new chat id due to the exchange of their ids
+    participantsId.sort();
+    debugPrint('particepents : $participantsId');
 
-    chatId = participentsId.join('_');
-    debugPrint('chat id : $chatId');
+    chatRoomId = participantsId.join('_');
+    debugPrint('chat id : $chatRoomId');
+    getIt<NotificationsRepository>().setChatRoomId(chatRoomId);
+    return chatRoomId;
   }
 
   Future<Message> sendMessage(
@@ -42,7 +46,6 @@ class ChatRepository {
       required String messageType,
       required String status}) async {
     final currentUser = FirebaseAuth.instance.currentUser;
-
     final Message newMessage = Message(
       id: _uuid.v1(),
       senderId: currentUser!.uid,
@@ -55,14 +58,31 @@ class ChatRepository {
 
     final addedDocument = await _firestore
         .collection("Chat_Rooms")
-        .doc(chatId)
+        .doc(chatRoomId)
         .collection("Messages")
         .add(newMessage.toMap());
     if (newMessage.status != 'uploading') {
       final newMessageSnapshot = await addedDocument.get();
 
       final newMessage = Message.fromMap(newMessageSnapshot.data()!);
-      _addChatModelToDatabase(contact: contact, mostRecentMessage: newMessage);
+      await _addChatModelToDatabase(
+          contact: contact, mostRecentMessage: newMessage);
+      final senderProfilePicture =
+          await getIt<NotificationsRepository>().getSenderProfilePicture();
+      await getIt<NotificationsRepository>().pushNotification(
+        receiverId: contact.id,
+        notificationPayloadModel: NotificationPayload(
+            messageId: newMessage.id,
+            messageText: newMessage.text,
+            senderName: currentUser.displayName != ''
+                ? currentUser.displayName!
+                : currentUser.phoneNumber!,
+            chatRoomId: chatRoomId,
+            senderId: currentUser.uid,
+            senderPhoneNumber: currentUser.phoneNumber!,
+            senderProfilePicture: senderProfilePicture),
+      );
+
       return newMessage;
     }
     return newMessage;
@@ -79,20 +99,22 @@ class ChatRepository {
     _updateMessagesData(messageId: message.id, updates: {'isDeleted': true});
     final querySnapshot = await _firestore
         .collection("Chat_Rooms")
-        .doc(chatId)
+        .doc(chatRoomId)
         .collection("Messages")
         .orderBy('time', descending: true)
         .limit(1)
         .get();
     if (querySnapshot.docs.isNotEmpty) {
-      _updateOngoingChatsData(
-          messageId: message.id,
-          userId: currentUser!.uid,
-          updates: {'isLastMessageDeleted': true});
-      _updateOngoingChatsData(
-          messageId: message.id,
-          userId: receiverId,
-          updates: {'isLastMessageDeleted': true});
+      if (querySnapshot.docs.first.data()['id'] == message.id) {
+        _updateOngoingChatsData(
+            messageId: message.id,
+            userId: currentUser!.uid,
+            updates: {'isLastMessageDeleted': true});
+        _updateOngoingChatsData(
+            messageId: message.id,
+            userId: receiverId,
+            updates: {'isLastMessageDeleted': true});
+      }
     }
 
     if (message.type != 'text') {
@@ -103,7 +125,7 @@ class ChatRepository {
   Future<void> deleteMessagePermanently(String messageId) async {
     final messageSnapshot = await _firestore
         .collection('Chat_Rooms')
-        .doc(chatId)
+        .doc(chatRoomId)
         .collection('Messages')
         .limit(1)
         .where('id', isEqualTo: messageId)
@@ -112,7 +134,7 @@ class ChatRepository {
     if (messageSnapshot.docs.first.exists) {
       await _firestore
           .collection('Chat_Rooms')
-          .doc(chatId)
+          .doc(chatRoomId)
           .collection('Messages')
           .doc(messageSnapshot.docs.first.id)
           .delete();
@@ -124,21 +146,12 @@ class ChatRepository {
       required String userId,
       required Map<String, dynamic> updates}) async {
     try {
-      final querySnapshot = await _firestore
+      _firestore
           .collection("OngoingChats")
           .doc(userId)
           .collection("Conversations")
-          .where('lastMessageId', isEqualTo: messageId)
-          .limit(1)
-          .get();
-      if (querySnapshot.docs.isNotEmpty) {
-        _firestore
-            .collection("OngoingChats")
-            .doc(userId)
-            .collection("Conversations")
-            .doc(querySnapshot.docs.first.id)
-            .update(updates);
-      }
+          .doc(chatRoomId)
+          .update(updates);
     } catch (error) {
       throw Exception('Error updating ongoing message data $error');
     }
@@ -151,7 +164,7 @@ class ChatRepository {
     try {
       final querySnapshot = await _firestore
           .collection("Chat_Rooms")
-          .doc(chatId)
+          .doc(chatRoomId)
           .collection("Messages")
           .where('id', isEqualTo: messageId)
           .limit(1)
@@ -160,7 +173,7 @@ class ChatRepository {
       if (querySnapshot.docs.isNotEmpty) {
         await _firestore
             .collection("Chat_Rooms")
-            .doc(chatId)
+            .doc(chatRoomId)
             .collection("Messages")
             .doc(querySnapshot.docs.first.id)
             .update(updates);
@@ -170,27 +183,24 @@ class ChatRepository {
     }
   }
 
-  Future<void> updateMessageStatus(String messageId, String status) async {
+  Future<void> updateMessageStatus(String messageId, String status,
+      {String? receiverId}) async {
     final currentUser = FirebaseAuth.instance.currentUser;
 
-    String peerUserId =
-        chatId.replaceAll(currentUser!.uid, '').replaceAll('_', '');
+    String peerUserId = receiverId ??
+        chatRoomId.replaceAll(currentUser!.uid, '').replaceAll('_', '');
     await _updateMessagesData(
         messageId: messageId, updates: {'status': status});
     await _updateOngoingChatsData(
         messageId: messageId,
         userId: peerUserId,
         updates: {'lastMessageStatus': status});
-    await _updateOngoingChatsData(
-        messageId: messageId,
-        userId: currentUser.uid,
-        updates: {'lastMessageStatus': status});
   }
 
   Future<int> _getUnreadMessagesCount(String receiverId) async {
     final unreadMessagesSubscription = await _firestore
         .collection("Chat_Rooms")
-        .doc(chatId)
+        .doc(chatRoomId)
         .collection("Messages")
         .where('receiverId', isEqualTo: receiverId)
         .where('status', isNotEqualTo: 'seen')
@@ -208,7 +218,7 @@ class ChatRepository {
         .collection("OngoingChats")
         .doc(currentUser!.uid)
         .collection("Conversations")
-        .doc(chatId)
+        .doc(chatRoomId)
         .update({'unreadMessagesCount': 0});
   }
 
@@ -221,7 +231,7 @@ class ChatRepository {
       contact: contact,
       id: contact.id,
       phoneNumber: contact.phoneNumber,
-      profilePicture: contact.profilePicture ?? AppConstants.defaultUserPhoto,
+      profilePicture: contact.profilePicture,
       mostRecentMessage: mostRecentMessage,
     );
 
@@ -231,7 +241,7 @@ class ChatRepository {
           currentUser!.uid,
         )
         .collection("Conversations")
-        .doc(chatId)
+        .doc(chatRoomId)
         .set(senderOnGoingChatModel.toMap());
   }
 
@@ -245,7 +255,7 @@ class ChatRepository {
     final OnGoingChat receiverOnGoingChatModel = OnGoingChat.fromReceiverData(
         id: currentUser!.uid,
         phoneNumber: currentUser.phoneNumber!,
-        profilePicture: currentUser.photoURL ?? AppConstants.defaultUserPhoto,
+        profilePicture: currentUser.photoURL,
         mostRecentMessage: mostRecentMessage,
         unreadMessagesCount: unreadMessagesCount);
 
@@ -253,7 +263,7 @@ class ChatRepository {
         .collection("OngoingChats")
         .doc(contact.id)
         .collection("Conversations")
-        .doc(chatId)
+        .doc(chatRoomId)
         .set(receiverOnGoingChatModel.toMap());
   }
 
@@ -323,17 +333,6 @@ class ChatRepository {
     }
   }
 
-  String extractFileName(String url) {
-    Uri uri = Uri.parse(url);
-    String fileName = uri.pathSegments.last;
-
-    // If the filename contains a query string, remove it
-    if (fileName.contains('/')) {
-      fileName = fileName.split('/').last;
-    }
-    return fileName;
-  }
-
   Future<File> _saveFilePermanently(PlatformFile file) async {
     final directory = await getApplicationDocumentsDirectory();
     final newFile = File('${directory.path}/${file.name}');
@@ -347,6 +346,7 @@ class ChatRepository {
       File? thumbnailVideo,
       required String messageType,
       required ContactModel contact}) async {
+    final User currentUser = FirebaseAuth.instance.currentUser!;
     final newMessage = await sendMessage(
       contact: contact,
       messageText: messageType != 'video' ? file.path : thumbnailVideo!.path,
@@ -375,6 +375,18 @@ class ChatRepository {
           thumbnailVideoUrl //this field was not created when sending message but update will create it
     });
     await _updateChatModelWithNewMessage(newMessage.id, contact);
+    final senderProfilePicture =
+        await getIt<NotificationsRepository>().getSenderProfilePicture();
+    await getIt<NotificationsRepository>().pushNotification(
+        notificationPayloadModel: NotificationPayload(
+            messageId: newMessage.id,
+            messageText: messageType,
+            senderName: currentUser.displayName ?? currentUser.phoneNumber!,
+            senderPhoneNumber: currentUser.phoneNumber!,
+            chatRoomId: chatRoomId,
+            senderId: currentUser.uid,
+            senderProfilePicture: senderProfilePicture),
+        receiverId: contact.id);
   }
 
   Future<String?> _uploadFileAndGetUrl(
@@ -398,7 +410,7 @@ class ChatRepository {
       String messageId, ContactModel contact) async {
     final querySnapshot = await _firestore
         .collection('Chat_Rooms')
-        .doc(chatId)
+        .doc(chatRoomId)
         .collection('Messages')
         .where('id', isEqualTo: messageId)
         .limit(1)
