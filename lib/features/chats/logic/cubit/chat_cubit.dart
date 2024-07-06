@@ -13,7 +13,7 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 part 'chat_state.dart';
 
 class ChatCubit extends Cubit<ChatState> {
-  final _firestoreDatabase = FirebaseFirestore.instance;
+  final _firestore = FirebaseFirestore.instance;
   final currentUser = FirebaseAuth.instance.currentUser;
 
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _messageSubscription;
@@ -25,7 +25,7 @@ class ChatCubit extends Cubit<ChatState> {
   ChatCubit(this._chatRepository) : super(ChatInitial());
 
   void initializeChatData(String contactId) async {
-    await _chatRepository.getChatId(contactId);
+    await _chatRepository.getChatRoomId(contactId);
     getMessages();
   }
 
@@ -43,9 +43,9 @@ class ChatCubit extends Cubit<ChatState> {
 
   void getMessages() {
     List<Message> messages = [];
-    _messageSubscription = _firestoreDatabase
+    _messageSubscription = _firestore
         .collection("Chat_Rooms")
-        .doc(_chatRepository.chatId)
+        .doc(_chatRepository.chatRoomId)
         .collection("Messages")
         .orderBy('time', descending: true)
         .snapshots()
@@ -75,7 +75,7 @@ class ChatCubit extends Cubit<ChatState> {
   void getOnGoingChats() async {
     final deviceContacts = await _chatRepository.getDeviceContacts();
     List<OnGoingChat> onGoingChats = [];
-    _onGoingMessageSubscription = _firestoreDatabase
+    _onGoingMessageSubscription = _firestore
         .collection("OngoingChats")
         .doc(currentUser!.uid)
         .collection("Conversations")
@@ -86,11 +86,10 @@ class ChatCubit extends Cubit<ChatState> {
         onGoingChats = onGoingChatsQuery.docs.map((doc) {
           final data = doc.data();
           final contact = deviceContacts.firstWhere(
-            (element) => element.phones.any(
-                (element) => element.normalizedNumber == data['phoneNumber']),
+            (contact) => contact.phones.any((phoneNumber) =>
+                phoneNumber.normalizedNumber == data['phoneNumber']),
             orElse: () => Contact(displayName: data['phoneNumber']),
           );
-
           return OnGoingChat.fromMap(data, contact.displayName);
         }).toList();
         emit(OnGoingChatsLoadedState(onGoingChats: onGoingChats));
@@ -122,10 +121,6 @@ class ChatCubit extends Cubit<ChatState> {
   void pickAndSendDocument(ContactModel contact) async {
     await _chatRepository.pickAndSendDocument(contact);
     getMessages();
-  }
-
-  String extractFileNameFromUrl(String url) {
-    return _chatRepository.extractFileName(url);
   }
 
   void viewDocumentFile(String fileUrl) async {
