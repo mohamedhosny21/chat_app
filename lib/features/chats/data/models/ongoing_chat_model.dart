@@ -6,7 +6,7 @@ import 'message_model.dart';
 class OnGoingChat {
   final String id;
   final String? name;
-  final String profilePicture;
+  final String? profilePicture;
   final String phoneNumber;
   final String lastMessageId;
   final String lastMessage;
@@ -65,7 +65,7 @@ class OnGoingChat {
   factory OnGoingChat.fromReceiverData(
       {required String id,
       required String phoneNumber,
-      required String profilePicture,
+      required String? profilePicture,
       required Message mostRecentMessage,
       required int unreadMessagesCount}) {
     return OnGoingChat(
@@ -77,7 +77,7 @@ class OnGoingChat {
         lastMessageTime: mostRecentMessage.time,
         lastMessageType: mostRecentMessage.type,
         lastMessageSenderId: mostRecentMessage.senderId,
-        lastMessageStatus: mostRecentMessage.status,
+        lastMessageStatus: null,
         isLastMessageDeleted: mostRecentMessage.isDeleted,
         unreadMessagesCount: unreadMessagesCount);
   }
@@ -85,7 +85,7 @@ class OnGoingChat {
       {required ContactModel contact,
       required String id,
       required String phoneNumber,
-      required String profilePicture,
+      required String? profilePicture,
       required Message mostRecentMessage}) {
     return OnGoingChat(
         id: id,
