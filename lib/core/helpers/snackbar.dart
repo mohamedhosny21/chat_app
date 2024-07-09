@@ -16,7 +16,7 @@ void showSnackBar(BuildContext context, String snackBarMsg,
         ),
         title: Text(
           snackBarMsg,
-          style: AppStyles.font18Black600Weight,
+          style: AppStyles.font15Black500Weight,
         )),
     backgroundColor: snackBarColor,
   ));
