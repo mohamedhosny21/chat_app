@@ -302,17 +302,16 @@ class NotificationsRepository {
     final Directory directory = await getApplicationDocumentsDirectory();
     final String filePath = '${directory.path}/UserPhoto.png';
     final File file = File(filePath);
-    if (!await file.exists()) {
-      final http.Response response =
-          await http.get(Uri.parse(senderProfilePicUrl));
-      if (response.statusCode == 200) {
-        await file.writeAsBytes(
-          response.bodyBytes,
-        );
-      } else {
-        throw Exception('Failed to download sender profile pic');
-      }
+    final http.Response response =
+        await http.get(Uri.parse(senderProfilePicUrl));
+    if (response.statusCode == 200) {
+      await file.writeAsBytes(
+        response.bodyBytes,
+      );
+    } else {
+      throw Exception('Failed to download sender profile pic');
     }
+
     return file.readAsBytes();
   }
 
