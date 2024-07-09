@@ -123,7 +123,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         width: 279,
         height: 36,
         hintText: 'Write a message ...',
-        color: AppColors.lighterGrey,
+        prefixIconColor: AppColors.lighterGrey,
         controller: messageController);
   }
 
