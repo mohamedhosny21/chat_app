@@ -1,6 +1,7 @@
 import 'package:chatify/features/chats/logic/cubit/chat_cubit.dart';
 
 import '../../../../core/app_router/routes.dart';
+import '../../../../core/helpers/constants/app_constants.dart';
 import '../../../../core/theming/colors.dart';
 import '../../../../core/helpers/dimensions.dart';
 import '../../../../core/theming/styles.dart';
@@ -51,9 +52,11 @@ class _ChatsScreenState extends State<ChatsScreen> {
                     Navigator.pushNamedAndRemoveUntil(
                         context, Routes.loginScreen, (route) => false);
                   },
-                  child: const CircleAvatar(
-                    backgroundImage: NetworkImage(
-                        'https://th.bing.com/th/id/OIP.NqY3rNMnx2NXYo3KJfg43gAAAA?w=183&h=183&c=7&r=0&o=5&dpr=1.4&pid=1.7'),
+                  child: CircleAvatar(
+                    backgroundImage: chatCubit.currentUser?.photoURL != null
+                        ? NetworkImage(chatCubit.currentUser!.photoURL!)
+                            as ImageProvider
+                        : const AssetImage(AppConstants.defaultUserPhoto),
                   ),
                 )
               ],
@@ -62,14 +65,16 @@ class _ChatsScreenState extends State<ChatsScreen> {
             const UserStories(),
             const Divider(),
             AppDimensions.verticalSpacing10,
-            SearchTextFormField(),
+            SearchTextFormField(
+              searchController: chatCubit.searchController,
+            ),
             AppDimensions.verticalSpacing20,
             _buildChatsList()
           ],
         ),
       )),
       floatingActionButton: FloatingActionButton(
-          backgroundColor: AppColors.lightPink,
+          backgroundColor: AppColors.lighterPink,
           onPressed: () {
             Navigator.pushNamed(context, Routes.contactsScreen);
           },
