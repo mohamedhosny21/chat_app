@@ -6,28 +6,59 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class AppTextFormField extends StatelessWidget {
   final double width;
   final double height;
-  final TextEditingController controller;
-  final String hintText;
+  final TextEditingController? controller;
+  final String? hintText;
+  final IconData? suffixIcon;
+  final Color? suffixIconColor;
+  final double? suffixIconSize;
+  final void Function(String)? onChanged;
+
   final IconData? prefixIcon;
   final double? prefixIconSize;
-  final Color color;
+  final InputBorder? inputBorder;
+  final EdgeInsetsGeometry? contentPadding;
+  final String? initialValue;
+  final InputBorder? enabledBorder;
+  final TextStyle? hintStyle;
+  final InputBorder? focusedBorder;
+  final bool? readOnly;
+  final Color? inputColor;
+  final Color? prefixIconColor;
   const AppTextFormField(
       {super.key,
       required this.width,
       required this.height,
-      required this.hintText,
+      this.inputColor,
+      this.hintText,
       this.prefixIcon,
+      this.inputBorder,
+      this.focusedBorder,
+      this.readOnly,
+      this.hintStyle,
+      this.enabledBorder,
       this.prefixIconSize,
-      required this.color,
-      required this.controller});
+      this.prefixIconColor,
+      this.controller,
+      this.initialValue,
+      this.contentPadding,
+      this.suffixIcon,
+      this.suffixIconColor,
+      this.suffixIconSize,
+      this.onChanged});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.lighterGrey,
+      color: inputColor ?? AppColors.lighterGrey,
       width: width.w,
       height: height.h,
       child: TextFormField(
+        cursorColor: AppColors.darkPink,
+        onChanged: onChanged,
+        initialValue: initialValue,
+        style: AppStyles.font14Black400Weight
+            .copyWith(fontWeight: FontWeight.bold),
+        readOnly: readOnly ?? false,
         onTapOutside: (event) {
           //to hide the focus from textformfield when tapping on something else
           FocusManager.instance.primaryFocus!.unfocus();
@@ -35,17 +66,26 @@ class AppTextFormField extends StatelessWidget {
         controller: controller,
         maxLines: null,
         decoration: InputDecoration(
-          contentPadding: EdgeInsets.symmetric(
-            vertical: (height - 30.h) /
-                2, // Adjust based on font size and container height
-          ),
+          contentPadding: contentPadding ??
+              EdgeInsets.symmetric(
+                vertical: (height - 30.h) /
+                    2, // Adjust based on font size and container height
+              ),
           hintText: hintText,
-          hintStyle: AppStyles.font14Grey600Weight.copyWith(height: 2.8.h),
-          border: InputBorder.none,
+          hintStyle: hintStyle ??
+              AppStyles.font14Grey600Weight.copyWith(height: 2.8.h),
+          border: inputBorder ?? InputBorder.none,
+          enabledBorder: enabledBorder ?? InputBorder.none,
+          focusedBorder: focusedBorder ?? InputBorder.none,
           prefixIcon: Icon(
             prefixIcon,
             size: prefixIconSize?.w,
-            color: color,
+            color: prefixIconColor,
+          ),
+          suffixIcon: Icon(
+            suffixIcon,
+            size: suffixIconSize?.w,
+            color: suffixIconColor,
           ),
         ),
       ),
@@ -54,9 +94,9 @@ class AppTextFormField extends StatelessWidget {
 }
 
 class SearchTextFormField extends StatelessWidget {
-  final TextEditingController _searchController = TextEditingController();
+  final TextEditingController searchController;
 
-  SearchTextFormField({super.key});
+  const SearchTextFormField({super.key, required this.searchController});
 
   @override
   Widget build(BuildContext context) {
@@ -64,10 +104,57 @@ class SearchTextFormField extends StatelessWidget {
       width: 372,
       height: 36,
       hintText: 'Search',
-      color: AppColors.mainGrey,
-      controller: _searchController,
+      prefixIconColor: AppColors.mainGrey,
+      controller: searchController,
       prefixIcon: Icons.search,
       prefixIconSize: 24,
     );
+  }
+}
+
+class ProfileTextFormField extends StatelessWidget {
+  final IconData? suffixIcon;
+  final Color? suffixIconColor;
+  final double? suffixIconSize;
+  final void Function(String)? onChanged;
+  final EdgeInsetsGeometry? contentPadding;
+  final String? hintText;
+  final IconData prefixIcon;
+  final bool? readOnly;
+  final String? initialValue;
+  final TextEditingController? controller;
+  const ProfileTextFormField(
+      {super.key,
+      this.hintText,
+      required this.prefixIcon,
+      this.controller,
+      this.readOnly,
+      this.initialValue,
+      this.contentPadding,
+      this.suffixIcon,
+      this.suffixIconColor,
+      this.suffixIconSize,
+      this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppTextFormField(
+        enabledBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: AppColors.darkPink)),
+        width: 300,
+        focusedBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: AppColors.darkPink)),
+        height: 36,
+        onChanged: onChanged,
+        prefixIcon: prefixIcon,
+        suffixIcon: suffixIcon,
+        suffixIconColor: AppColors.darkPink,
+        contentPadding: contentPadding,
+        readOnly: readOnly ?? false,
+        initialValue: initialValue,
+        prefixIconColor: AppColors.darkPink,
+        inputColor: Colors.white,
+        hintText: hintText ?? '',
+        controller: controller);
   }
 }
