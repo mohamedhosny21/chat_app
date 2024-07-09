@@ -7,6 +7,8 @@ import 'package:chatify/features/chats/data/repository/chat_repository.dart';
 import 'package:chatify/features/contacts/data/repository/contact_repository.dart';
 import 'package:chatify/features/contacts/logic/cubit/contacts_cubit.dart';
 import 'package:chatify/features/login/logic/cubit/authentication_cubit.dart';
+import 'package:chatify/features/profile/data/profile_repository.dart';
+import 'package:chatify/features/profile/logic/cubit/profile_cubit.dart';
 import 'package:get_it/get_it.dart';
 
 final getIt = GetIt.instance;
@@ -16,6 +18,7 @@ Future<void> setupGetIt() async {
   final ContactRepository contactRepository = ContactRepository();
   final NotificationsWebservices notificationsWebservices =
       NotificationsWebservices();
+  final ProfileRepository profileRepository = ProfileRepository();
 
   getIt.registerFactory<AuthenticationCubit>(() => AuthenticationCubit());
   getIt.registerFactory<ChatCubit>(() => ChatCubit(chatRepository));
@@ -23,4 +26,5 @@ Future<void> setupGetIt() async {
   getIt.registerLazySingleton<NotificationsRepository>(() =>
       NotificationsRepository(
           notificationsWebservices: notificationsWebservices));
+  getIt.registerFactory<ProfileCubit>(() => ProfileCubit(profileRepository));
 }
