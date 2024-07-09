@@ -34,9 +34,9 @@ class ContactItem extends StatelessWidget {
   CircleAvatar _contactPhoto() {
     return CircleAvatar(
       radius: 30.r,
-      child: contact.profilePicture != null
-          ? Image.network(contact.profilePicture!)
-          : Image.asset(AppConstants.defaultUserPhoto),
+      backgroundImage: contact.profilePicture != null
+          ? NetworkImage(contact.profilePicture!) as ImageProvider
+          : const AssetImage(AppConstants.defaultUserPhoto),
     );
   }
 
