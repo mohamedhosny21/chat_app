@@ -22,12 +22,13 @@ import '../models/ongoing_chat_model.dart';
 
 class ChatRepository {
   final _firestore = FirebaseFirestore.instance;
+  final _firebaseAuth = FirebaseAuth.instance;
   final _storage = FirebaseStorage.instance;
   final Uuid _uuid = const Uuid();
   String chatRoomId = '';
 
   Future<String> getChatRoomId(String receiverId) async {
-    final currentUser = FirebaseAuth.instance.currentUser;
+    final currentUser = _firebaseAuth.currentUser;
 
     List<String> participantsId = [currentUser!.uid, receiverId];
     //sort is essential so if the sender and receiverId are exchanged with each other then the chatRoomId will be the same id without creating new chat id due to the exchange of their ids
@@ -45,7 +46,7 @@ class ChatRepository {
       required String messageText,
       required String messageType,
       required String status}) async {
-    final currentUser = FirebaseAuth.instance.currentUser;
+    final currentUser = _firebaseAuth.currentUser;
     final Message newMessage = Message(
       id: _uuid.v1(),
       senderId: currentUser!.uid,
@@ -94,7 +95,7 @@ class ChatRepository {
   }
 
   void updateDeletedMessages(Message message, String receiverId) async {
-    final currentUser = FirebaseAuth.instance.currentUser;
+    final currentUser = _firebaseAuth.currentUser;
 
     _updateMessagesData(messageId: message.id, updates: {'isDeleted': true});
     final querySnapshot = await _firestore
@@ -107,13 +108,9 @@ class ChatRepository {
     if (querySnapshot.docs.isNotEmpty) {
       if (querySnapshot.docs.first.data()['id'] == message.id) {
         _updateOngoingChatsData(
-            messageId: message.id,
-            userId: currentUser!.uid,
-            updates: {'isLastMessageDeleted': true});
+            userId: currentUser!.uid, updates: {'isLastMessageDeleted': true});
         _updateOngoingChatsData(
-            messageId: message.id,
-            userId: receiverId,
-            updates: {'isLastMessageDeleted': true});
+            userId: receiverId, updates: {'isLastMessageDeleted': true});
       }
     }
 
@@ -142,9 +139,7 @@ class ChatRepository {
   }
 
   Future<void> _updateOngoingChatsData(
-      {required String messageId,
-      required String userId,
-      required Map<String, dynamic> updates}) async {
+      {required String userId, required Map<String, dynamic> updates}) async {
     try {
       _firestore
           .collection("OngoingChats")
@@ -185,16 +180,14 @@ class ChatRepository {
 
   Future<void> updateMessageStatus(String messageId, String status,
       {String? receiverId}) async {
-    final currentUser = FirebaseAuth.instance.currentUser;
+    final currentUser = _firebaseAuth.currentUser;
 
     String peerUserId = receiverId ??
         chatRoomId.replaceAll(currentUser!.uid, '').replaceAll('_', '');
     await _updateMessagesData(
         messageId: messageId, updates: {'status': status});
     await _updateOngoingChatsData(
-        messageId: messageId,
-        userId: peerUserId,
-        updates: {'lastMessageStatus': status});
+        userId: peerUserId, updates: {'lastMessageStatus': status});
   }
 
   Future<int> _getUnreadMessagesCount(String receiverId) async {
@@ -212,7 +205,7 @@ class ChatRepository {
   }
 
   Future<void> resetUnreadMessagesCount() async {
-    final currentUser = FirebaseAuth.instance.currentUser;
+    final currentUser = _firebaseAuth.currentUser;
 
     await _firestore
         .collection("OngoingChats")
@@ -225,7 +218,7 @@ class ChatRepository {
   void _addSenderChatModelToDatabase(
       {required ContactModel contact,
       required Message mostRecentMessage}) async {
-    final currentUser = FirebaseAuth.instance.currentUser;
+    final currentUser = _firebaseAuth.currentUser;
 
     final OnGoingChat senderOnGoingChatModel = OnGoingChat.fromSenderData(
       contact: contact,
@@ -248,7 +241,7 @@ class ChatRepository {
   void _addReceiverChatModelToDatabase(
       {required ContactModel contact,
       required Message mostRecentMessage}) async {
-    final currentUser = FirebaseAuth.instance.currentUser;
+    final currentUser = _firebaseAuth.currentUser;
 
     final int unreadMessagesCount = await _getUnreadMessagesCount(contact.id);
 
@@ -265,6 +258,33 @@ class ChatRepository {
         .collection("Conversations")
         .doc(chatRoomId)
         .set(receiverOnGoingChatModel.toMap());
+  }
+
+  Future<void> listenToUsersPhotoChanges(OnGoingChat onGoingChat) async {
+    final currentUser = _firebaseAuth.currentUser;
+    _firestore
+        .collection('Users')
+        .doc(onGoingChat.id)
+        .snapshots()
+        .listen((snapshot) {
+      if (snapshot.exists) {
+        final String? userPhoto = snapshot.data()?['photo'];
+        if (userPhoto != null && userPhoto != onGoingChat.profilePicture) {
+          _firestore
+              .collection('OngoingChats')
+              .doc(currentUser!.uid)
+              .collection('Conversations')
+              .where('id', isEqualTo: onGoingChat.id)
+              .get()
+              .then((chatsSnapshot) {
+            chatsSnapshot.docs.first.reference.update(
+                {'profilePicture': snapshot.data()!['photo']}).then((_) {
+              debugPrint('chat photo of ${onGoingChat.phoneNumber} updated');
+            });
+          });
+        }
+      }
+    });
   }
 
   Future<void> _addChatModelToDatabase(
@@ -346,7 +366,7 @@ class ChatRepository {
       File? thumbnailVideo,
       required String messageType,
       required ContactModel contact}) async {
-    final User currentUser = FirebaseAuth.instance.currentUser!;
+    final User currentUser = _firebaseAuth.currentUser!;
     final newMessage = await sendMessage(
       contact: contact,
       messageText: messageType != 'video' ? file.path : thumbnailVideo!.path,

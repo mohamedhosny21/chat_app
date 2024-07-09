@@ -15,6 +15,7 @@ part 'chat_state.dart';
 class ChatCubit extends Cubit<ChatState> {
   final _firestore = FirebaseFirestore.instance;
   final currentUser = FirebaseAuth.instance.currentUser;
+  final TextEditingController searchController = TextEditingController();
 
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _messageSubscription;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
@@ -73,6 +74,8 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   void getOnGoingChats() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+
     final deviceContacts = await _chatRepository.getDeviceContacts();
     List<OnGoingChat> onGoingChats = [];
     _onGoingMessageSubscription = _firestore
@@ -82,7 +85,7 @@ class ChatCubit extends Cubit<ChatState> {
         .orderBy("lastMessageTime", descending: true)
         .snapshots()
         .listen(
-      (onGoingChatsQuery) {
+      (onGoingChatsQuery) async {
         onGoingChats = onGoingChatsQuery.docs.map((doc) {
           final data = doc.data();
           final contact = deviceContacts.firstWhere(
@@ -93,6 +96,9 @@ class ChatCubit extends Cubit<ChatState> {
           return OnGoingChat.fromMap(data, contact.displayName);
         }).toList();
         emit(OnGoingChatsLoadedState(onGoingChats: onGoingChats));
+        for (OnGoingChat onGoingChat in onGoingChats) {
+          await _chatRepository.listenToUsersPhotoChanges(onGoingChat);
+        }
       },
     );
   }
