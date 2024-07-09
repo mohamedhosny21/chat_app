@@ -48,7 +48,7 @@ class OtpScreen extends StatelessWidget {
                         .submitPhoneOtp(smsCode, verificationId);
                   }
                 },
-                color: AppColors.lightPink,
+                color: AppColors.lighterPink,
                 minWidth: double.infinity,
                 height: 40.h,
                 child: Text(
@@ -106,7 +106,7 @@ class OtpScreen extends StatelessWidget {
           fieldWidth: 40.w,
           fieldHeight: 50.h,
           activeColor: Colors.green,
-          inactiveColor: AppColors.lightPink,
+          inactiveColor: AppColors.lighterPink,
           selectedColor: Colors.blue,
           shape: PinCodeFieldShape.box,
         ),
