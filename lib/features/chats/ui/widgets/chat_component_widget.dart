@@ -99,7 +99,7 @@ class ChatComponents extends StatelessWidget {
       } else if (onGoingChat.lastMessageStatus == 'seen') {
         return Icon(
           Icons.done_all,
-          color: AppColors.lightPink,
+          color: AppColors.lighterPink,
           size: 15.0.w,
         );
       }
@@ -148,7 +148,7 @@ class ChatComponents extends StatelessWidget {
         onGoingChat.lastMessageStatus != 'seen' &&
         onGoingChat.unreadMessagesCount! > 0) {
       return Container(
-        padding: AppDimensions.paddingSymmetricH5,
+        padding: AppDimensions.paddingHorizontal5,
         decoration: BoxDecoration(
           color: AppColors.darkPink,
           borderRadius: BorderRadius.circular(20.0.r),

@@ -136,7 +136,7 @@ class MessageItem extends StatelessWidget {
         return _positionedMessageStatusIcon(Icons.done, Colors.white);
       } else if (message.status == 'delivered') {
         return _positionedMessageStatusIcon(
-            Icons.done_all, AppColors.lightPink);
+            Icons.done_all, AppColors.lighterPink);
       } else if (message.status == 'seen') {
         return _positionedMessageStatusIcon(Icons.done_all, Colors.white);
       } else {
