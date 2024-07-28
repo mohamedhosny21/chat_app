@@ -19,7 +19,7 @@ A new Flutter project.
 
 ## dotted border Animation on user story border in case the story is uploading
 
-<img src="https://github.com/user-attachments/assets/32d05e9d-2ef4-49c1-8b76-c9364e7f0850)" width="300" />
+<img src="https://github.com/user-attachments/assets/32d05e9d-2ef4-49c1-8b76-c9364e7f0850" width="300" />
 
 ## Showing foreground notification with Firebase Cloud Messaging when receiving new message
 
