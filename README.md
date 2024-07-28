@@ -6,23 +6,23 @@ A new Flutter project.
 
   Login with phone number
   
-![Screenshot_1722190915](https://github.com/user-attachments/assets/bcc83089-7571-4eef-ad6b-8255e318d59a)
+<img src="https://github.com/user-attachments/assets/bcc83089-7571-4eef-ad6b-8255e318d59a" width="200" />
 
   Enter the received OTP
 
-![Screenshot_1722204923](https://github.com/user-attachments/assets/f3edca53-c7f2-4708-a407-fba40d2076ca)
+<img src="https://github.com/user-attachments/assets/f3edca53-c7f2-4708-a407-fba40d2076ca" width="200" />
 
   Home Screen
   
-![Screenshot_1722205002](https://github.com/user-attachments/assets/dec8b244-ae40-4833-a2f1-1fd6944f3b47)
+<img src="https://github.com/user-attachments/assets/dec8b244-ae40-4833-a2f1-1fd6944f3b47" width="200" />
 
 dotted border Animation on user story border in case the story is uploading
 
-![Screenshot_1722201078](https://github.com/user-attachments/assets/32d05e9d-2ef4-49c1-8b76-c9364e7f0850)
+<img src="https://github.com/user-attachments/assets/32d05e9d-2ef4-49c1-8b76-c9364e7f0850)" width="200" />
 
 Showing foreground notification with Firebase Cloud Messaging when receiving new message
 
-![Screenshot_1722200229](https://github.com/user-attachments/assets/ccbe13ad-39f2-4f3d-870d-2f074e40131e)
+<img src="https://github.com/user-attachments/assets/ccbe13ad-39f2-4f3d-870d-2f074e40131e" width="200" />
 
 Showing background notification with Firebase Cloud Messaging when receiving new message in background state
 
