@@ -5,7 +5,7 @@ A new Flutter project.
 ## Getting Started
 
 
- # Login with phone number
+ ## Login with phone number
 
 <img src="https://github.com/user-attachments/assets/bcc83089-7571-4eef-ad6b-8255e318d59a" width="300" />
 
