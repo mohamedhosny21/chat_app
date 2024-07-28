@@ -43,13 +43,19 @@ A new Flutter project.
 
 <img src="https://github.com/user-attachments/assets/a9df9b76-6f06-4298-a065-e957ee19f880" width="300" />
 
+
+
 <img src="https://github.com/user-attachments/assets/002afb98-1e27-420b-b1b0-716253021e6a" width="300" />
+
+
 
 <img src="https://github.com/user-attachments/assets/4c6aebb2-8b31-4b5e-9ef9-05f64e724ae7" width="300" />
 
 ## Ability to edit stories before adding it like: cropping images and trim videos
 
 <img src="https://github.com/user-attachments/assets/b37c7418-170f-4394-b6df-734904c5153a" width="300" />
+
+
 
 <img src="https://github.com/user-attachments/assets/55db5be2-6ce6-453e-8bb5-c91cd885e9b1" width="300" />
 
