@@ -6,7 +6,7 @@ A new Flutter project.
 
   Login with phone number
   
-<img src="https://github.com/user-attachments/assets/bcc83089-7571-4eef-ad6b-8255e318d59a" width="200" />
+<img src="https://github.com/user-attachments/assets/bcc83089-7571-4eef-ad6b-8255e318d59a" width="400" />
 
   Enter the received OTP
 
