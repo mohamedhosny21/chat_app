@@ -4,8 +4,10 @@ A new Flutter project.
 
 ## Getting Started
 
-  Login with phone number
-  
+
+<span style="font-size:0.5em;">  Login with phone number
+</span>
+
 <img src="https://github.com/user-attachments/assets/bcc83089-7571-4eef-ad6b-8255e318d59a" width="300" />
 
   Enter the received OTP
