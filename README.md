@@ -1,9 +1,23 @@
 # chatify
 
-A new Flutter project.
+Chatify is a robust real-time chat application designed to provide a seamless messaging experience across both Android and iOS platforms. The application features real-time messaging, user authentication, Pushing Notifications ,and multimedia support, making it a versatile tool for users to stay connected.
+
+## Key Features:
+ Real-Time Messaging: Implemented real-time chat functionality using Firebase Realtime Database, ensuring instant delivery of messages.
+ 
+ User Authentication: Integrated Firebase Authentication to manage user sign-in and sign-up securely.
+ 
+ Rich Media Support: Enabled users to share images, videos, and voice messages seamlessly
+ 
+ Cloud Storage: Integrated Firebase Cloud Storage to upload and get photos
+ 
+ Firestore: Integrated Firestore database to store data
+ 
+ Bloc State Management: using bloc to handle app states
+ 
+ Responsive UI : Designed a responsive user-friendly interface with smooth navigation and interactive elements to fit different devices.
 
 ## Getting Started
-
 
  ## Login with phone number
 
