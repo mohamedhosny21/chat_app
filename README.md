@@ -10,6 +10,8 @@ Chatify is a robust real-time chat application designed to provide a seamless me
  Rich Media Support: Enabled users to share images, videos, and voice messages seamlessly
  
  Cloud Storage: Integrated Firebase Cloud Storage to upload and get photos
+
+ Firebase Cloud Messaging: Integrated FCM for pushing notifications in foreground and background states
  
  Firestore: Integrated Firestore database to store data
  
