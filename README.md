@@ -5,7 +5,7 @@ Chatify is a robust real-time chat application designed to provide a seamless me
 ## Key Features:
  Real-Time Messaging: Implemented real-time chat functionality using Firebase Realtime Database, ensuring instant delivery of messages.
  
- User Authentication: Integrated Firebase Authentication to manage user sign-in and sign-up securely.
+ User Authentication: Integrated Firebase Authentication to manage user sign-in with phone OTP securely.
  
  Rich Media Support: Enabled users to share images, videos, and voice messages seamlessly
  
