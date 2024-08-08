@@ -1,7 +1,10 @@
-import 'package:chatify/chatify_app.dart';
-import 'package:chatify/core/dependency_injection/dependency_injection.dart';
-import 'package:chatify/core/notifications_manager/data/notifications_repository.dart';
-import 'package:chatify/features/login/logic/cubit/authentication_cubit.dart';
+import 'package:chatify/core/config/app_config.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'chatify_app.dart';
+import 'core/dependency_injection/dependency_injection.dart';
+import 'core/notifications_manager/data/notifications_repository.dart';
+import 'features/login/logic/cubit/authentication_cubit.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -21,12 +24,12 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     await setupGetIt();
     debugPrint('now it is registered');
   }
+  await ScreenUtil.ensureScreenSize();
+
   await getIt<NotificationsRepository>()
       .updateMessagesStatusToDelivered(chatRoomId: message.data['chatRoomId']);
   debugPrint("Handling a background message: ${message.messageId}");
 }
-
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,6 +47,6 @@ void main() async {
   runApp(ChatifyApp(
     initialRoute: initialRoute,
     appRouter: AppRouter(),
-    navigatorKey: navigatorKey,
+    navigatorKey: AppConfig.navigatorKey,
   ));
 }
