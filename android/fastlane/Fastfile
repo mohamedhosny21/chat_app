@@ -1,0 +1,22 @@
+
+
+default_platform(:android)
+
+platform :android do
+  desc "Lane for Android Firebase App Distribution"
+  lane :firebase_distribution do
+    sh "flutter clean"
+    sh "flutter build apk --release --flavor production --target lib/main_production.dart --no-tree-shake-icons"
+    firebase_app_distribution(
+      app: "1:829298540112:android:6b88464aa0275c3cffdb55",
+      firebase_cli_token: ENV["FIREBASE_CLI_TOKEN"],
+      android_artifact_type: "APK",
+      android_artifact_path: "../build/app/outputs/flutter-apk/app-production-release.apk",
+      testers: "mohamedhosny9877@gmail.com",
+      groups: "family-testers",
+      release_notes: "New Release for Chatify",
+      upload_timeout: 10800     # 3 hrs - Increase as needed
+    )
+  end
+
+end
