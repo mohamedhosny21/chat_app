@@ -10,6 +10,8 @@ class AppColors {
   static const darkGrey = Color(0xFF8A9099);
   static const green = Color(0xFF2CC069);
   static const lightPink = Color.fromARGB(255, 239, 102, 102);
-  static const lighterPink = Color(0xFFFFB0B0);
+  static const moreLighterPink = Color(0xFFFFB0B0);
   static const darkPink = Color(0xFFD84D4D);
+  static const lighterPink = Color(0xFFF28585);
+  static const transparentDarkPink = Color(0x1FD84D4D);
 }
