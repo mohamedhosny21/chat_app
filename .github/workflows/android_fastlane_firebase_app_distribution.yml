@@ -10,10 +10,10 @@ jobs:   # Groups together all the jobs that run in this workflow.
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup JDK 22
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           java-version: '22'
           distribution: 'temurin'
