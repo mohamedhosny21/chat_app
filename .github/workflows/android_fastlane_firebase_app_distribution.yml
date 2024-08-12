@@ -27,7 +27,7 @@ jobs:   # Groups together all the jobs that run in this workflow.
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.3.4 
-          bundler-cache: true
+          bundler-cache: true 
           working-directory: android
 
       - name: Build and Distribute App
