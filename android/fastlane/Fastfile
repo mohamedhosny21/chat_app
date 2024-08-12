@@ -15,7 +15,7 @@ platform :android do
       testers: "mohamedhosny9877@gmail.com",
       groups: "family-testers",
       release_notes: "Final touch for fastlane with GitHub Actions",
-      upload_timeout: 10800     # 3 hrs - Increase as needed
+      upload_timeout: 10800     # <= 3 hrs - Increase as needed
     )
   end
 
