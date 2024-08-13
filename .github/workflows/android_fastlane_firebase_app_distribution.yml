@@ -39,7 +39,7 @@ jobs:   # Groups together all the jobs that run in this workflow.
       - name: Build and Distribute App
         env:
           FIREBASE_CLI_TOKEN: ${{ secrets.FIREBASE_CLI_TOKEN }}
-          JAVA_HOME: ${{ env.JAVA_HOME }}
+          JAVA_HOME: $JAVA_HOME
          
         run: |
           bundle exec fastlane android firebase_distribution
