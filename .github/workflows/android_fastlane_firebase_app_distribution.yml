@@ -12,10 +12,10 @@ jobs:   # Groups together all the jobs that run in this workflow.
       - name: Checkout repository code
         uses: actions/checkout@v4
 
-      - name: Setup JDK 17
+      - name: Setup JDK 22
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '22'
           distribution: 'temurin'
  
       - name: Print JAVA_HOME
