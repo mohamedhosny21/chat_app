@@ -35,6 +35,9 @@ jobs:   # Groups together all the jobs that run in this workflow.
           ruby-version: 3.3.4 
           bundler-cache: true   
           working-directory: android
+          
+      - name: Print FIREBASE_CLI_TOKEN
+        run: echo "FIREBASE_CLI_TOKEN is ${{ secrets.FIREBASE_CLI_TOKEN }}"
 
       - name: Build and Distribute App
         env:
