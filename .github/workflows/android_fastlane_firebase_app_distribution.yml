@@ -4,7 +4,7 @@ name: Android Fastlane With Firebase App Distribution # Optional: Workflow Name
 on: 
   push: 
     branches:
-      - main
+      - main 
 jobs:   # Groups together all the jobs that run in this workflow.
   distribute_to_firebase:  # Job Name
     runs-on: ubuntu-latest
