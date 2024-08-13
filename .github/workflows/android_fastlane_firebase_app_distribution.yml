@@ -17,7 +17,7 @@ jobs:   # Groups together all the jobs that run in this workflow.
         with:
           java-version: '22'
           distribution: 'temurin'
-
+ 
       - name: Print JAVA_HOME
         run: |
           echo "JAVA_HOME is set to $JAVA_HOME"
