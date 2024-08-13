@@ -34,7 +34,7 @@ jobs:   # Groups together all the jobs that run in this workflow.
         env:
           FIREBASE_CLI_TOKEN: ${{ secrets.FIREBASE_CLI_TOKEN }}
           Java_Home: /usr/lib/jvm/java-22-openjdk-amd64
-          PATH: $PATH:/usr/lib/jvm/java-22-openjdk-amd64/bin
+          PATH: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/22.0.2-9/x64/bin:$PATH
           
         run: |
           bundle exec fastlane android firebase_distribution
