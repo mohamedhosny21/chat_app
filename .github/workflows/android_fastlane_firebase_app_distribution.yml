@@ -21,8 +21,8 @@ jobs:   # Groups together all the jobs that run in this workflow.
       - name: Print JAVA_HOME
         run: |
           echo "JAVA_HOME is set to $JAVA_HOME"
-          ls -l $JAVA_HOME  # Check if the path exists and is valid
-          java -version
+          ls -l $JAVA_HOME 
+          $JAVA_HOME/bin/java -version
 
       - name: Install Flutter
         uses: subosito/flutter-action@v2
