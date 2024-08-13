@@ -24,7 +24,7 @@ jobs:   # Groups together all the jobs that run in this workflow.
           ls -l $JAVA_HOME 
           $JAVA_HOME/bin/java -version
 
-      - name: Install Flutter
+      - name: Install Flutter 
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
