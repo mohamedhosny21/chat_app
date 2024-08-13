@@ -18,7 +18,7 @@ jobs:   # Groups together all the jobs that run in this workflow.
           java-version: '22'
           distribution: 'temurin'
 
-        - name: Print JAVA_HOME
+      - name: Print JAVA_HOME
         run: |
           echo "JAVA_HOME is set to $JAVA_HOME"
           java -version
@@ -39,7 +39,6 @@ jobs:   # Groups together all the jobs that run in this workflow.
         env:
           FIREBASE_CLI_TOKEN: ${{ secrets.FIREBASE_CLI_TOKEN }}
          
-          
         run: |
           bundle exec fastlane android firebase_distribution
         working-directory: android 
