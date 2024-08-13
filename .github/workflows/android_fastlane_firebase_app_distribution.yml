@@ -5,7 +5,7 @@ on:
   push: 
     branches:
       - main 
-jobs:   # Groups together all the jobs that run in this workflow.
+jobs:   # Groups together all the jobs that run in this workflow. 
   distribute_to_firebase:  # Job Name
     runs-on: ubuntu-latest
     steps:
