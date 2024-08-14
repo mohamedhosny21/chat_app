@@ -1,7 +1,7 @@
 name: Android Fastlane With Firebase App Distribution # Optional: Workflow Name 
 
 
-on:   
+on:    
   push: 
     branches:
       - main 
