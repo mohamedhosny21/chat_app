@@ -31,7 +31,7 @@ jobs:   # Groups together all the jobs that run in this workflow.
  
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
-        with:
+        with: 
           ruby-version: 3.3.4 
           bundler-cache: true   
           working-directory: android
