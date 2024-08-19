@@ -1,4 +1,8 @@
 buildscript {
+     repositories {
+        google() // Required for Android Gradle plugin
+        mavenCentral() // Required for general dependencies
+    }
     dependencies {
         classpath 'com.android.tools.build:gradle:8.5.0'
     }
