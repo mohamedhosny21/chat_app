@@ -16,13 +16,9 @@ jobs:   # Groups together all the jobs that run in this workflow.
         uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribution: 'temurin' 
+          distribution: 'temurin'
  
-      - name: Print JAVA_HOME
-        run: |
-          echo "JAVA_HOME is set to $JAVA_HOME"
-          ls -l $JAVA_HOME 
-          $JAVA_HOME/bin/java -version
+    
 
       - name: Install Flutter  
         uses: subosito/flutter-action@v2
