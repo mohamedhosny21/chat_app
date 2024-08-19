@@ -25,16 +25,16 @@ if (flutterVersionName == null) {
 android {
     namespace "com.example.chatify"
     compileSdkVersion 34
-    ndkVersion flutter.ndkVersion
+    ndkVersion "26.1.10909125"
 
     compileOptions {// Flag to enable support for the new language APIs
     coreLibraryDesugaringEnabled true
-        sourceCompatibility JavaVersion.VERSION_22
-        targetCompatibility JavaVersion.VERSION_22
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = '22'
+        jvmTarget = '17'
     }
 
     sourceSets {
