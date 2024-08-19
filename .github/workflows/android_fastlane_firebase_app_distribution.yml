@@ -29,7 +29,7 @@ jobs:   # Groups together all the jobs that run in this workflow.
         with: 
           ruby-version: 3.3.4 
           bundler-cache: true   
-          working-directory: android
+          working-directory: android 
 
       - name: Build and Distribute App
         env:
