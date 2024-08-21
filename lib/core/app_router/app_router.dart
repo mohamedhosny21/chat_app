@@ -1,12 +1,21 @@
-import 'package:chatify/core/dependency_injection/dependency_injection.dart';
-import 'package:chatify/core/permissions_handler/permissions_handler_cubit.dart';
-import 'package:chatify/features/chats/ui/screens/video_message_screen.dart';
-import 'package:chatify/features/contacts/data/contact_model.dart';
-import 'package:chatify/features/contacts/logic/cubit/contacts_cubit.dart';
-import 'package:chatify/features/contacts/ui/contacts_screen.dart';
-import 'package:chatify/features/chats/logic/cubit/chat_cubit.dart';
-import 'package:chatify/features/chats/ui/screens/chat_room_screen.dart';
-import '../../features/chats/ui/screens/image_message_screen.dart';
+import 'dart:io';
+
+import '../dependency_injection/dependency_injection.dart';
+import '../permissions_handler/permissions_handler_cubit.dart';
+import '../../features/home/chats/ui/screens/video_message_screen.dart';
+import '../../features/contacts/data/contact_model.dart';
+import '../../features/contacts/logic/cubit/contacts_cubit.dart';
+import '../../features/contacts/ui/contacts_screen.dart';
+import '../../features/home/chats/logic/cubit/chat_cubit.dart';
+import '../../features/home/chats/ui/screens/chat_room_screen.dart';
+import '../../features/home/stories/data/model/story_model.dart';
+import '../../features/home/stories/ui/screens/video_story_preview_screen.dart';
+import 'package:file_picker/file_picker.dart';
+import '../../features/home/stories/logic/cubit/stories_cubit.dart';
+import '../../features/home/stories/ui/screens/image_story_preview_screen.dart';
+import '../../features/home/stories/ui/screens/story_view_screen.dart';
+import '../../features/home/stories/ui/screens/text_story_preview_screen.dart';
+import '../../features/home/chats/ui/screens/image_message_screen.dart';
 import '../../features/login/logic/cubit/authentication_cubit.dart';
 import '../../features/login/ui/login_screen.dart';
 import '../../features/login/ui/otp_screen.dart';
@@ -87,6 +96,49 @@ class AppRouter {
                   isSentByMe: argumentData['isSentByMe'],
                   imageMessage: argumentData['imageMessage'],
                 ));
+      case Routes.textStoryPreviewScreen:
+        final storiesCubit = settings.arguments as StoriesCubit;
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) => BlocProvider<StoriesCubit>.value(
+            value: storiesCubit,
+            child: const TextStoryPreviewScreen(),
+          ),
+        );
+      case Routes.imageStoryPreviewScreen:
+        final argumentData = settings.arguments as Map<String, dynamic>;
+        final imageFile = argumentData['imageFile'];
+        final storiesCubit = argumentData['storiesCubit'];
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) => BlocProvider<StoriesCubit>.value(
+            value: storiesCubit,
+            child: ImageStoryPreviewScreen(
+              imageFile: imageFile,
+            ),
+          ),
+        );
+      case Routes.videoStoryPreviewScreen:
+        final argumentData = settings.arguments as Map<String, dynamic>;
+        final videoFile = argumentData['videoFile'];
+        final storiesCubit = argumentData['storiesCubit'];
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) => BlocProvider<StoriesCubit>.value(
+            value: storiesCubit,
+            child: VideoStoryPreviewScreen(
+              videoFile: videoFile,
+            ),
+          ),
+        );
+      case Routes.storyViewScreen:
+        final stories = settings.arguments as List<StoryModel>;
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) => StoryViewScreen(
+            stories: stories,
+          ),
+        );
       default:
         null;
     }

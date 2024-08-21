@@ -18,7 +18,12 @@ class AppTextFormField extends StatelessWidget {
   final InputBorder? inputBorder;
   final EdgeInsetsGeometry? contentPadding;
   final String? initialValue;
+  final Color? cursorColor;
+  final double? cursorHeight;
+  final bool autofocus;
   final InputBorder? enabledBorder;
+  final TextStyle? inputTextStyle;
+  final TextAlign? textAlign;
   final TextStyle? hintStyle;
   final InputBorder? focusedBorder;
   final bool? readOnly;
@@ -29,6 +34,7 @@ class AppTextFormField extends StatelessWidget {
       required this.width,
       required this.height,
       this.inputColor,
+      this.autofocus = false,
       this.hintText,
       this.prefixIcon,
       this.inputBorder,
@@ -44,7 +50,11 @@ class AppTextFormField extends StatelessWidget {
       this.suffixIcon,
       this.suffixIconColor,
       this.suffixIconSize,
-      this.onChanged});
+      this.onChanged,
+      this.cursorColor,
+      this.cursorHeight,
+      this.inputTextStyle,
+      this.textAlign});
 
   @override
   Widget build(BuildContext context) {
@@ -53,11 +63,15 @@ class AppTextFormField extends StatelessWidget {
       width: width.w,
       height: height.h,
       child: TextFormField(
-        cursorColor: AppColors.darkPink,
+        textAlign: textAlign ?? TextAlign.start,
+        cursorHeight: cursorHeight,
+        cursorColor: cursorColor ?? AppColors.darkPink,
         onChanged: onChanged,
+        autofocus: autofocus,
         initialValue: initialValue,
-        style: AppStyles.font14Black400Weight
-            .copyWith(fontWeight: FontWeight.bold),
+        style: inputTextStyle ??
+            AppStyles.font14Black400Weight
+                .copyWith(fontWeight: FontWeight.bold),
         readOnly: readOnly ?? false,
         onTapOutside: (event) {
           //to hide the focus from textformfield when tapping on something else

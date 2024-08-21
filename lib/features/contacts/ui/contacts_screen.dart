@@ -1,9 +1,9 @@
-import 'package:chatify/core/helpers/dimensions.dart';
-import 'package:chatify/core/theming/colors.dart';
-import 'package:chatify/core/theming/styles.dart';
-import 'package:chatify/core/helpers/snackbar.dart';
-import 'package:chatify/core/widgets/back_button_widget.dart';
-import 'package:chatify/features/contacts/data/contact_model.dart';
+import '../../../core/helpers/dimensions.dart';
+import '../../../core/theming/colors.dart';
+import '../../../core/theming/styles.dart';
+import '../../../core/helpers/snackbar.dart';
+import '../../../core/widgets/back_button_widget.dart';
+import '../data/contact_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

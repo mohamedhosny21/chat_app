@@ -8,13 +8,6 @@ class ProfileUpdatingState extends ProfileState {}
 
 class ProfilePictureLoadingState extends ProfileState {}
 
-class SavedUserProfileDataLoadedState extends ProfileState {
-  final String profilePictureUrl;
-  final String userAbout;
-  SavedUserProfileDataLoadedState(
-      {required this.profilePictureUrl, required this.userAbout});
-}
-
 class UserAboutChangedState extends ProfileState {
   final bool isUserAboutChanged;
 
@@ -22,9 +15,9 @@ class UserAboutChangedState extends ProfileState {
 }
 
 class TemporaryUserPhotoUploadedState extends ProfileState {
-  final String profilePictureUrl;
+  final String profilePicturePath;
 
-  TemporaryUserPhotoUploadedState({required this.profilePictureUrl});
+  TemporaryUserPhotoUploadedState({required this.profilePicturePath});
 }
 
 class UserPhotoUploadingState extends ProfileState {}

@@ -1,6 +1,6 @@
-import 'package:chatify/core/helpers/constants/app_constants.dart';
-import 'package:chatify/core/theming/styles.dart';
-import 'package:chatify/features/contacts/data/contact_model.dart';
+import '../../../../core/helpers/constants/app_constants.dart';
+import '../../../../core/theming/styles.dart';
+import '../../data/contact_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 

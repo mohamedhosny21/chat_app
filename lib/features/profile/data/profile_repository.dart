@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:chatify/core/helpers/shared_preferences.dart';
+import '../../../core/helpers/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -34,13 +34,6 @@ class ProfileRepository {
 
   Future<String> _getUserPhotoUrlFromCloudStorage(
       TaskSnapshot uploadTask) async {
-    // final currentUser = _firebaseAuth.currentUser;
-
-    // final Reference reference = _storage
-    //     .ref()
-    //     .child('UsersProfilePics')
-    //     .child(currentUser!.uid)
-    //     .child('newUserPhoto.png');
     return await uploadTask.ref.getDownloadURL();
   }
 
@@ -59,14 +52,7 @@ class ProfileRepository {
         .collection('Users')
         .doc(currentUser.uid)
         .update({'photo': profilePictureUrl});
-    await SharedPreferencesHelper.setString('userPhoto', profilePictureUrl);
   }
-
-  // Future<void> _updateUserChatPhoto(
-  //     {required String profilePictureUrl}) async {
-  //       final currentUser=_firebaseAuth.currentUser;
-  //       await _firestore.collection("O")
-  //     }
 
   Future<void> updateUserAbout({required String userAbout}) async {
     final currentUser = _firebaseAuth.currentUser;
@@ -75,7 +61,14 @@ class ProfileRepository {
           .collection('Users')
           .doc(currentUser!.uid)
           .update({'about': userAbout});
-      await SharedPreferencesHelper.setString('userAbout', userAbout);
     }
+  }
+
+  Future<String> getUserAbout() async {
+    final currentUser = _firebaseAuth.currentUser;
+    final userAboutSnapshot =
+        await _firestore.collection('Users').doc(currentUser!.uid).get();
+    final String? userAbout = userAboutSnapshot.data()?['about'];
+    return userAbout ?? '';
   }
 }

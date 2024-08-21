@@ -1,8 +1,8 @@
-import 'package:chatify/core/helpers/dimensions.dart';
-import 'package:chatify/core/theming/styles.dart';
-import 'package:chatify/features/profile/ui/widgets/save_changes_button.dart';
-import 'package:chatify/features/profile/ui/widgets/username_with_circle_avatar.dart';
-import 'package:chatify/features/profile/ui/widgets/user_data_fields.dart';
+import '../../../core/helpers/dimensions.dart';
+import '../../../core/theming/styles.dart';
+import 'widgets/save_changes_button.dart';
+import 'widgets/username_with_circle_avatar.dart';
+import 'widgets/user_data_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -18,7 +18,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
-    context.read<ProfileCubit>().getSavedProfileData();
+    context.read<ProfileCubit>().getUserAbout();
     super.initState();
   }
 

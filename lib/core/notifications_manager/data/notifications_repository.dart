@@ -2,13 +2,14 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
-import 'package:chatify/core/app_router/navigator_observer.dart';
-import 'package:chatify/core/app_router/routes.dart';
-import 'package:chatify/core/helpers/constants/app_constants.dart';
-import 'package:chatify/core/notifications_manager/data/models/notification_payload_model.dart';
-import 'package:chatify/core/notifications_manager/data/notifications_webservices.dart';
-import 'package:chatify/features/contacts/data/contact_model.dart';
-import 'package:chatify/main.dart';
+import 'package:chatify/core/config/app_config.dart';
+
+import '../../app_router/navigator_observer.dart';
+import '../../app_router/routes.dart';
+import '../../helpers/constants/app_constants.dart';
+import 'models/notification_payload_model.dart';
+import 'notifications_webservices.dart';
+import '../../../features/contacts/data/contact_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -200,7 +201,7 @@ class NotificationsRepository {
         await _getContactNameByPhoneNumber(message.data['senderPhoneNumber']);
     final currentRoute = AppNavigatorObserver.currentRoute;
     if (currentRoute != Routes.chatRoomScreen) {
-      navigatorKey.currentState!.pushNamed(Routes.chatRoomScreen,
+      AppConfig.navigatorKey.currentState!.pushNamed(Routes.chatRoomScreen,
           arguments: ContactModel(
             id: message.data['senderId'],
             name: senderName,
@@ -208,13 +209,14 @@ class NotificationsRepository {
             profilePicture: message.data['senderProfilePicture'],
           ));
     } else {
-      navigatorKey.currentState!.pushReplacementNamed(Routes.chatRoomScreen,
-          arguments: ContactModel(
-            id: message.data['senderId'],
-            name: senderName,
-            phoneNumber: message.data['senderPhoneNumber'],
-            profilePicture: message.data['senderProfilePicture'],
-          ));
+      AppConfig.navigatorKey.currentState!
+          .pushReplacementNamed(Routes.chatRoomScreen,
+              arguments: ContactModel(
+                id: message.data['senderId'],
+                name: senderName,
+                phoneNumber: message.data['senderPhoneNumber'],
+                profilePicture: message.data['senderProfilePicture'],
+              ));
     }
   }
 
@@ -251,7 +253,7 @@ class NotificationsRepository {
           messageData['data']['senderPhoneNumber']);
       final currentRoute = AppNavigatorObserver.currentRoute;
       if (currentRoute != Routes.chatRoomScreen) {
-        navigatorKey.currentState!.pushNamed(Routes.chatRoomScreen,
+        AppConfig.navigatorKey.currentState!.pushNamed(Routes.chatRoomScreen,
             arguments: ContactModel(
               id: messageData['data']['senderId'],
               name: senderName,
@@ -262,13 +264,14 @@ class NotificationsRepository {
         final bool isSameChatRoomId =
             _isSameChatRoomId(messageData['data']['chatRoomId']);
         if (!isSameChatRoomId) {
-          navigatorKey.currentState!.pushReplacementNamed(Routes.chatRoomScreen,
-              arguments: ContactModel(
-                id: messageData['data']['senderId'],
-                name: senderName,
-                phoneNumber: messageData['data']['senderPhoneNumber'],
-                profilePicture: messageData['data']['senderProfilePicture'],
-              ));
+          AppConfig.navigatorKey.currentState!
+              .pushReplacementNamed(Routes.chatRoomScreen,
+                  arguments: ContactModel(
+                    id: messageData['data']['senderId'],
+                    name: senderName,
+                    phoneNumber: messageData['data']['senderPhoneNumber'],
+                    profilePicture: messageData['data']['senderProfilePicture'],
+                  ));
         }
       }
     }

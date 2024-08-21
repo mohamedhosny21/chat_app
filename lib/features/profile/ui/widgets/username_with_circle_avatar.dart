@@ -1,5 +1,8 @@
-import 'package:chatify/features/profile/logic/cubit/profile_cubit.dart';
-import 'package:chatify/features/profile/ui/widgets/upload_photo_button.dart';
+import 'dart:io';
+
+import '../../logic/cubit/profile_cubit.dart';
+import 'upload_photo_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -44,16 +47,15 @@ class UserNameWithCircleAvatar extends StatelessWidget {
         ));
       } else if (state is TemporaryUserPhotoUploadedState) {
         return _buildCustomCircleAvatar(
-            image: NetworkImage(state.profilePictureUrl));
+            image: FileImage(File(state.profilePicturePath)));
       }
 
       return _buildCustomCircleAvatar(
         image: context.read<ProfileCubit>().temporaryUploadedUserPhoto != null
-            ? NetworkImage(
-                    context.read<ProfileCubit>().temporaryUploadedUserPhoto!)
-                as ImageProvider
-            : context.read<ProfileCubit>().savedUserPhoto != null
-                ? NetworkImage(context.read<ProfileCubit>().savedUserPhoto!)
+            ? FileImage(
+                File(context.read<ProfileCubit>().temporaryUploadedUserPhoto!))
+            : context.read<ProfileCubit>().currentUser?.photoURL != null
+                ? NetworkImage(FirebaseAuth.instance.currentUser!.photoURL!)
                     as ImageProvider
                 : const AssetImage(AppConstants.defaultUserPhoto),
       );

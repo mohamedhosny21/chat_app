@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:chatify/core/helpers/constants/api_constants.dart';
-import 'package:chatify/core/notifications_manager/data/models/notification_payload_model.dart';
+import '../../helpers/constants/api_constants.dart';
+import 'models/notification_payload_model.dart';
 
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;

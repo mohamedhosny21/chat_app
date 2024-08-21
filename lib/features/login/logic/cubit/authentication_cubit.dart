@@ -1,6 +1,6 @@
-import 'package:chatify/core/dependency_injection/dependency_injection.dart';
-import 'package:chatify/core/notifications_manager/data/notifications_repository.dart';
-import 'package:chatify/features/login/data/user_model.dart';
+import '../../../../core/dependency_injection/dependency_injection.dart';
+import '../../../../core/notifications_manager/data/notifications_repository.dart';
+import '../../data/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

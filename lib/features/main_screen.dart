@@ -1,9 +1,10 @@
-import 'package:chatify/core/dependency_injection/dependency_injection.dart';
-import 'package:chatify/features/chats/logic/cubit/chat_cubit.dart';
-import 'package:chatify/features/profile/logic/cubit/profile_cubit.dart';
+import '../core/dependency_injection/dependency_injection.dart';
+import 'home/chats/logic/cubit/chat_cubit.dart';
+import 'home/stories/logic/cubit/stories_cubit.dart';
+import 'profile/logic/cubit/profile_cubit.dart';
 
 import 'calls/calls_screen.dart';
-import 'chats/ui/screens/chats_screen.dart';
+import 'home/home_screen.dart';
 import 'login/logic/cubit/authentication_cubit.dart';
 import 'profile/ui/profile_screen.dart';
 import 'package:flutter/material.dart';
@@ -26,12 +27,15 @@ class _NavBarPagesState extends State<NavBarPages> {
         BlocProvider<ChatCubit>(
           create: (context) => getIt<ChatCubit>(),
         ),
+        BlocProvider<StoriesCubit>(
+          create: (context) => getIt<StoriesCubit>(),
+        ),
       ],
-      child: const ChatsScreen(),
+      child: const HomeScreen(),
     ),
     const CallsScreen(),
-    BlocProvider<ProfileCubit>(
-      create: (context) => getIt<ProfileCubit>(),
+    BlocProvider<ProfileCubit>.value(
+      value: getIt<ProfileCubit>(),
       child: const ProfileScreen(),
     )
   ];

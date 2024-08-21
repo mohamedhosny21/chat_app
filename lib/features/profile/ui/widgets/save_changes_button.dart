@@ -1,8 +1,8 @@
-import 'package:chatify/core/helpers/circular_progress_indicator.dart';
-import 'package:chatify/core/helpers/snackbar.dart';
-import 'package:chatify/core/theming/colors.dart';
-import 'package:chatify/features/profile/ui/widgets/build_save_changes_button_widget.dart';
-import 'package:chatify/features/profile/ui/widgets/build_unpressed_button.dart';
+import '../../../../core/helpers/circular_progress_indicator.dart';
+import '../../../../core/helpers/snackbar.dart';
+import '../../../../core/theming/colors.dart';
+import 'build_save_changes_button_widget.dart';
+import 'build_unpressed_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../logic/cubit/profile_cubit.dart';
