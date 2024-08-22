@@ -916,7 +916,7 @@ packages:
       sha256: "6dcdd298136523eaf7dfc31abaf0dfba9aa8a8dbc96670e87e9d42b6f2caf774"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.2"
+    version: "2.3.2" 
   video_thumbnail:
     dependency: transitive
     description:
