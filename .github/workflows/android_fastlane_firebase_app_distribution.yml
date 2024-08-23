@@ -16,7 +16,7 @@ jobs:   # Groups together all the jobs that run in this workflow.
         uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribution: 'temurin'
+          distribution: 'temurin' 
  
   
       - name: Install Flutter  
