@@ -85,5 +85,5 @@ Chatify is a robust real-time chat application designed to provide a seamless me
 
 ## Profile Screen
 
-<img src="https://github.com/user-attachments/assets/98d2b271-a824-4569-983e-747570020869" width="300">
+<img src="https://github.com/user-attachments/assets/5dc2596a-bbd7-425c-b62a-091b27f0824d" width"300" />
 
