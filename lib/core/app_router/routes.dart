@@ -11,4 +11,5 @@ class Routes {
   static const String imageStoryPreviewScreen = '/image_story_preview_screen';
   static const String videoStoryPreviewScreen = '/video_story_preview_screen';
   static const String storyViewScreen = '/story_view_screen';
+  static const String cameraViewScreen = '/camera_view_screen';
 }

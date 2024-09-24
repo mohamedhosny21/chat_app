@@ -24,7 +24,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     await setupGetIt();
     debugPrint('now it is registered');
   }
-  await ScreenUtil.ensureScreenSize();
 
   await getIt<NotificationsRepository>()
       .updateMessagesStatusToDelivered(chatRoomId: message.data['chatRoomId']);
@@ -32,6 +31,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 void main() async {
+  await ScreenUtil.ensureScreenSize();
+
   WidgetsFlutterBinding.ensureInitialized();
 
   await dotenv.load(fileName: ".env");

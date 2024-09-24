@@ -28,6 +28,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  camera: ^0.11.0+2
   cloud_firestore: ^5.1.0
   cupertino_icons: ^1.0.2
   dashed_circle: ^0.0.2
@@ -82,7 +83,7 @@ flutter:
   assets:
     - assets/images/
     - assets/gifs/
-    # - .env
+    - .env
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

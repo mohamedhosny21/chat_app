@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:camera/camera.dart';
+
+import '../../features/home/stories/ui/screens/camera_view_screen.dart';
 import '../dependency_injection/dependency_injection.dart';
 import '../permissions_handler/permissions_handler_cubit.dart';
 import '../../features/home/chats/ui/screens/video_message_screen.dart';
@@ -107,27 +110,29 @@ class AppRouter {
         );
       case Routes.imageStoryPreviewScreen:
         final argumentData = settings.arguments as Map<String, dynamic>;
-        final imageFile = argumentData['imageFile'];
         final storiesCubit = argumentData['storiesCubit'];
         return MaterialPageRoute(
           settings: settings,
           builder: (context) => BlocProvider<StoriesCubit>.value(
             value: storiesCubit,
             child: ImageStoryPreviewScreen(
-              imageFile: imageFile,
+              imageName: argumentData['imageName'],
+              imageType: argumentData['imageType'],
+              imagePath: argumentData['imagePath'],
             ),
           ),
         );
       case Routes.videoStoryPreviewScreen:
         final argumentData = settings.arguments as Map<String, dynamic>;
-        final videoFile = argumentData['videoFile'];
         final storiesCubit = argumentData['storiesCubit'];
         return MaterialPageRoute(
           settings: settings,
           builder: (context) => BlocProvider<StoriesCubit>.value(
             value: storiesCubit,
             child: VideoStoryPreviewScreen(
-              videoFile: videoFile,
+              videoName: argumentData['videoName'],
+              videoType: argumentData['videoType'],
+              videoPath: argumentData['videoPath'],
             ),
           ),
         );
@@ -137,6 +142,17 @@ class AppRouter {
           settings: settings,
           builder: (context) => StoryViewScreen(
             stories: stories,
+          ),
+        );
+      case Routes.cameraViewScreen:
+        final argumentData = settings.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) => BlocProvider<StoriesCubit>.value(
+            value: argumentData['storiesCubit'],
+            child: CameraViewScreen(
+              cameras: argumentData['cameras'],
+            ),
           ),
         );
       default:
