@@ -123,7 +123,7 @@ class _StoryViewScreenState extends State<StoryViewScreen>
                         aspectRatio: 1,
                         child: Image.network(
                           story.content,
-                          fit: BoxFit.contain,
+                          fit: BoxFit.fill,
                         )),
                   );
                 } else {

@@ -5,8 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../core/theming/styles.dart';
 import '../../logic/cubit/stories_cubit.dart';
 
-class UploadStoryOption extends StatelessWidget {
-  const UploadStoryOption({super.key});
+class ImageOrVideoStoryOption extends StatelessWidget {
+  const ImageOrVideoStoryOption({super.key});
 
   @override
   Widget build(BuildContext context) {

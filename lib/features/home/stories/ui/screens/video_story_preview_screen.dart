@@ -5,15 +5,19 @@ import '../../../../../core/theming/colors.dart';
 import '../../logic/cubit/stories_cubit.dart';
 import '../widgets/build_story_editor_icon_button.dart';
 import '../widgets/close_button.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:video_trimmer/video_trimmer.dart';
 
 class VideoStoryPreviewScreen extends StatefulWidget {
-  final PlatformFile videoFile;
-  const VideoStoryPreviewScreen({super.key, required this.videoFile});
+  final String videoPath, videoType, videoName;
+  const VideoStoryPreviewScreen({
+    super.key,
+    required this.videoPath,
+    required this.videoType,
+    required this.videoName,
+  });
 
   @override
   State<VideoStoryPreviewScreen> createState() =>
@@ -121,7 +125,7 @@ class _VideoStoryPreviewScreenState extends State<VideoStoryPreviewScreen> {
   }
 
   void _loadVideo() async {
-    await _trimmer.loadVideo(videoFile: File(widget.videoFile.path!));
+    await _trimmer.loadVideo(videoFile: File(widget.videoPath));
   }
 
   void _saveTrimmedVideoAndAddStory() async {
@@ -134,9 +138,9 @@ class _VideoStoryPreviewScreenState extends State<VideoStoryPreviewScreen> {
         debugPrint('trimmedVideoPath $trimmedVideoPath');
         Navigator.pop(context);
         context.read<StoriesCubit>().addFileStory(
-            filePath: trimmedVideoPath ?? widget.videoFile.path!,
-            fileType: widget.videoFile.extension!,
-            fileName: widget.videoFile.name,
+            filePath: trimmedVideoPath ?? widget.videoPath,
+            fileType: widget.videoType,
+            fileName: widget.videoName,
             videoDuration: videoDuration);
       },
     );

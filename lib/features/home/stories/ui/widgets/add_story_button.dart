@@ -2,7 +2,7 @@ import '../../../../../core/app_router/routes.dart';
 import '../../../../../core/helpers/extensions.dart';
 import 'camera_story_option.dart';
 import 'text_story_option.dart';
-import 'upload_story_option.dart';
+import 'image_or_video_story_option.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -23,7 +23,9 @@ class AddStoryButton extends StatelessWidget {
               context,
               Routes.imageStoryPreviewScreen,
               arguments: {
-                'imageFile': state.file,
+                'imagePath': state.file.path,
+                'imageType': state.file.extension,
+                'imageName': state.file.name,
                 'storiesCubit': context.read<StoriesCubit>()
               },
             );
@@ -32,7 +34,9 @@ class AddStoryButton extends StatelessWidget {
               context,
               Routes.videoStoryPreviewScreen,
               arguments: {
-                'videoFile': state.file,
+                'videoPath': state.file.path,
+                'videoType': state.file.extension,
+                'videoName': state.file.name,
                 'storiesCubit': context.read<StoriesCubit>()
               },
             );
@@ -85,7 +89,7 @@ Widget _buildStoryOptions() {
     children: [
       CameraStoryOption(),
       TextStoryOption(),
-      UploadStoryOption(),
+      ImageOrVideoStoryOption(),
     ],
   );
 }
